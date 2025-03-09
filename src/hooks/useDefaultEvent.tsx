@@ -5,11 +5,20 @@ import { getWindowSingle } from "../window/windowSingle";
 import { combineLatestWith, filter, map, merge, of, tap } from "rxjs";
 import { PAUSE_INTERSECTION, RESUME_INTERSECTION } from "../common/constant";
 
-export interface IEventPlugins {
-  defaultMovePlugins?: (() => void)[];
-  defaultUpPlugins?: (() => void)[];
-  defaultDownPlugins?: (() => void)[];
-}
+export const MOUSE_PLUGINS_KEYS = [
+  "defaultDownPlugins",
+  "defaultUpPlugins",
+  "defaultMovePlugins",
+] as const;
+
+export type IDEfaultPluginEvent = () => void;
+
+export type IMouseEventPlugins = Record<
+  (typeof MOUSE_PLUGINS_KEYS)[number],
+  IDEfaultPluginEvent[]
+>;
+
+export type IEventPlugins = IMouseEventPlugins & {};
 
 export const useDefaultEvent = (plugins?: IEventPlugins) => {
   const { width, height } = useWindowSize();
