@@ -11,27 +11,28 @@ import { useInsertDom } from "./useInsertDom";
 import { useAnimate } from "./useAnimate";
 import { useClock } from "./useClock";
 import { useStats } from "./useStats";
-import { useWindowSize } from "react-use";
+import { useMeasure } from "react-use";
 import { useDefaultEvent } from "./useDefaultEvent";
 import { checkIntersection } from "../plugins/render/checkIntersection";
 
 export const useInit3D = () => {
   const ref = useRef({
     loadCount: 0,
+    loaded: false,
   });
 
-  const { width, height } = useWindowSize();
+  const [mRef, { width, height }] = useMeasure();
   useWindow();
   useControls();
   useScene();
   useDefaultEvent();
   const { initDom } = useInsertDom();
   const animate = useAnimate();
-  const { render: renderUpdate } = useRender([checkIntersection, ...animate]);
+  const { render: renderUpdate } = useRender({ width, height },[checkIntersection, ...animate]);
   useClock();
   useStats();
   const { setPosition: setCameraPosition, lookAt: setCameraLookAt } =
-    useCamera();
+    useCamera({ width, height });
 
   const dracoLoader = useMemo(() => new DRACOLoader(), []);
 
@@ -83,10 +84,14 @@ export const useInit3D = () => {
   const setRef: RefCallback<HTMLDivElement> = useCallback(
     (dom) => {
       if (dom) {
-        initDom(dom);
+        mRef(dom);
+        if (!ref.current.loaded) {
+          initDom(dom);
+          ref.current.loaded = true;
+        }
       }
     },
-    [initDom]
+    [initDom, mRef]
   );
 
   return {

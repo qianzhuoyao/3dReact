@@ -1,10 +1,7 @@
 import { getWindowSingle } from "../window/windowSingle";
-import { useWindowSize } from "react-use";
 import { useCallback, useEffect } from "react";
 
-export const useCamera = () => {
-  const { width, height } = useWindowSize();
-
+export const useCamera = ({ width, height }: Record<string, number>) => {
   useEffect(() => {
     getWindowSingle().threeCamera.aspect = width / height;
     getWindowSingle().threeCamera.updateProjectionMatrix();

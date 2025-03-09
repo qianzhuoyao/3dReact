@@ -1,10 +1,10 @@
 import { useCallback, useEffect } from "react";
 import { getWindowSingle } from "../window/windowSingle";
-import { useWindowSize } from "react-use";
 
-export const useRender = (renderPlugins?: (() => void)[]) => {
-  const { width, height } = useWindowSize();
-
+export const useRender = (
+  { width, height }: Record<string, number>,
+  renderPlugins?: (() => void)[]
+) => {
   const render = useCallback(() => {
     renderPlugins?.forEach((plugin) => plugin());
     getWindowSingle().threeRender.render(
