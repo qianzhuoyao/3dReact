@@ -13,7 +13,6 @@ import { useClock } from "./useClock";
 import { useStats } from "./useStats";
 import { useWindowSize } from "react-use";
 import { useDefaultEvent } from "./useDefaultEvent";
-import { rotation } from "../plugins/render/rotation";
 import { checkIntersection } from "../plugins/render/checkIntersection";
 
 export const useInit3D = () => {
@@ -27,8 +26,8 @@ export const useInit3D = () => {
   useScene();
   useDefaultEvent();
   const { initDom } = useInsertDom();
-  const { render: renderUpdate } = useRender([checkIntersection, rotation]);
-  useAnimate();
+  const animate = useAnimate();
+  const { render: renderUpdate } = useRender([checkIntersection, ...animate]);
   useClock();
   useStats();
   const { setPosition: setCameraPosition, lookAt: setCameraLookAt } =
