@@ -14,6 +14,7 @@ import { useStats } from "./useStats";
 import { useMeasure } from "react-use";
 import { useDefaultEvent } from "./useDefaultEvent";
 import { checkIntersection } from "../plugins/render/checkIntersection";
+import * as THREE from "three";
 
 export const useInit3D = () => {
   const ref = useRef({
@@ -28,11 +29,18 @@ export const useInit3D = () => {
   useDefaultEvent();
   const { initDom } = useInsertDom();
   const animate = useAnimate();
-  const { render: renderUpdate } = useRender({ width, height },[checkIntersection, ...animate]);
+  const { render: renderUpdate } = useRender({ width, height }, [
+    checkIntersection,
+    ...animate,
+  ]);
   useClock();
   useStats();
-  const { setPosition: setCameraPosition, lookAt: setCameraLookAt } =
-    useCamera({ width, height });
+  const {
+    setPosition: setCameraPosition,
+    lookAt: setCameraLookAt,
+    setNear,
+    setFar,
+  } = useCamera({ width, height });
 
   const dracoLoader = useMemo(() => new DRACOLoader(), []);
 
@@ -42,6 +50,16 @@ export const useInit3D = () => {
     dracoLoader.setDecoderPath("draco/gltf/");
     loader.setDRACOLoader(dracoLoader);
   }, [dracoLoader, loader]);
+
+  const setCenter = useCallback(
+    (object: THREE.Group<THREE.Object3DEventMap>) => {
+      const box = new THREE.Box3().setFromObject(object); // 获取模型的包围盒
+      const center = new THREE.Vector3();
+      box.getCenter(center); // 计算中心点
+      object.position.sub(center); // 将模型移动到 (0,0,0)
+    },
+    []
+  );
 
   //目前只允许导入一个模型
   const load = useCallback(
@@ -56,8 +74,6 @@ export const useInit3D = () => {
           path,
           function (gltf) {
             const model = gltf.scene;
-            model.position.set(1, 1, 0);
-            model.scale.set(0.01, 0.01, 0.01);
             getWindowSingle().threeScene.add(model);
             getWindowSingle().threeModels.set(model.uuid, model);
             getWindowSingle().threeRender.setAnimationLoop(renderUpdate);
@@ -95,10 +111,13 @@ export const useInit3D = () => {
   );
 
   return {
+    setFar,
     setRef,
     width,
     height,
     load,
+    setNear,
+    setCenter,
     setCameraLookAt,
     setCameraPosition,
   };

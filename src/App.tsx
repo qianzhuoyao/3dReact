@@ -2,10 +2,12 @@ import { useMemo } from "react";
 import { useLoad } from "./hooks/useLoad";
 import { useWindowSize } from "react-use";
 
+
+
 function App() {
   const { width, height } = useWindowSize();
   const model = useMemo(
-    () => new URL("./model/LittlestTokyo.glb", import.meta.url).href,
+    () => new URL("./model/1.glb", import.meta.url).href,
     []
   );
 
