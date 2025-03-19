@@ -51,7 +51,11 @@ export const checkIntersection = () => {
     }
   });
 
+ 
+
   if (getWindowSingle().threeIntersection.length > 0) {
+
+  
     const object = getWindowSingle().threeIntersection[0].object;
     const material = object.material;
 
