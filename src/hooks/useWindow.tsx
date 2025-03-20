@@ -1,8 +1,8 @@
-import { useEffect } from "react"
-import { windowSingle } from "../window/windowSingle"
+import { useEffect } from "react";
+import { windowSingle } from "../window/windowSingle";
 
-export const useWindow=()=>{
-    useEffect(()=>{
-        windowSingle()
-    },[])
-}
+export const useWindow = () => {
+  useEffect(() => {
+    windowSingle();
+  }, []);
+};

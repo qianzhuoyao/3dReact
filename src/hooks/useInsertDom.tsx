@@ -6,6 +6,10 @@ export const useInsertDom = () => {
     getWindowSingle().threeRender.setPixelRatio(window.devicePixelRatio);
     getWindowSingle().threeDom = dom as HTMLElement;
     dom?.appendChild(getWindowSingle().threeRender.domElement);
+    getWindowSingle().threeCssRenderer.domElement.style.position = "absolute";
+    getWindowSingle().threeCssRenderer.domElement.style.top = "0";
+    getWindowSingle().threeCssRenderer.domElement.style.pointerEvents='none'
+    dom?.appendChild(getWindowSingle().threeCssRenderer.domElement);
   }, []);
 
   return {

@@ -8,10 +8,10 @@ export const useEvent = () => {
   const subscribe = useCallback(
     <T,>(
       taskSubscribe: (
-        dom: HTMLElement,
+        dom: HTMLElement | Window,
         task: (e: MouseEvent) => Promise<T | void>
       ) => Observable<T>,
-      dom: HTMLElement,
+      dom: HTMLElement | Window,
       cb?: (e: MouseEvent) => T | void
     ) => {
       return taskSubscribe(dom, (e) => {
@@ -24,19 +24,19 @@ export const useEvent = () => {
   );
 
   const moveSubscribe = useCallback(
-    (dom: HTMLElement, cb?: (e: MouseEvent) => void) =>
+    (dom: HTMLElement | Window, cb?: (e: MouseEvent) => void) =>
       subscribe<MouseEvent | void>(onMouseMoveTask, dom, cb),
     [subscribe]
   );
 
   const upSubscribe = useCallback(
-    (dom: HTMLElement, cb?: (e: MouseEvent) => void) =>
+    (dom: HTMLElement | Window, cb?: (e: MouseEvent) => void) =>
       subscribe<MouseEvent | void>(onMouseUpTask, dom, cb),
     [subscribe]
   );
 
   const downSubscribe = useCallback(
-    (dom: HTMLElement, cb?: (e: MouseEvent) => void) =>
+    (dom: HTMLElement | Window, cb?: (e: MouseEvent) => void) =>
       subscribe<MouseEvent | void>(onMouseDownTask, dom, cb),
     [subscribe]
   );

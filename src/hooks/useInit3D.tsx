@@ -15,6 +15,8 @@ import { useMeasure } from "react-use";
 import { useDefaultEvent } from "./useDefaultEvent";
 import { checkIntersection } from "../plugins/render/checkIntersection";
 import * as THREE from "three";
+import { cssLabelObject } from "../plugins/render/cssLabelObject";
+import { useClickModel } from "./useClickModel";
 
 export const useInit3D = () => {
   const ref = useRef({
@@ -24,6 +26,7 @@ export const useInit3D = () => {
 
   const [mRef, { width, height }] = useMeasure();
   useWindow();
+  useClickModel(width, height);
   useControls();
   useScene();
   useDefaultEvent();
@@ -31,6 +34,7 @@ export const useInit3D = () => {
   const animate = useAnimate();
   const { render: renderUpdate } = useRender({ width, height }, [
     checkIntersection,
+    cssLabelObject,
     ...animate,
   ]);
   useClock();
@@ -76,8 +80,9 @@ export const useInit3D = () => {
             const model = gltf.scene;
             getWindowSingle().threeScene.add(model);
             getWindowSingle().threeModels.set(model.uuid, model);
-            getWindowSingle().threeRender.setAnimationLoop(renderUpdate);
             callback?.(gltf);
+            getWindowSingle().threeRender.setAnimationLoop(renderUpdate);
+
             console.log(model, "model");
             ref.current.loadCount++;
             if (ref.current.loadCount > 1) {

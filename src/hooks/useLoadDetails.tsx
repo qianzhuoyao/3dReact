@@ -4,13 +4,7 @@ import * as THREE from "three";
 import { CSS3DObject } from "three/examples/jsm/Addons.js";
 import { getWindowSingle } from "../window/windowSingle";
 
-/**
- * 加载模型
- * @param models
- * @returns
- *
- */
-export const useLoad = (models: string[]) => {
+export const useModelDetails = (models: string[]) => {
   const ref = useRef({
     isLoaded: false,
   });

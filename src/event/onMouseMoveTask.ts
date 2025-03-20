@@ -1,7 +1,7 @@
 import { fromEvent, switchMap } from "rxjs";
 
 export const onMouseMoveTask = <T>(
-  dom: HTMLElement,
+  dom: HTMLElement|Window,
   task: (e: MouseEvent) => Promise<T>
 ) => {
   return fromEvent<MouseEvent>(dom, "mousemove")

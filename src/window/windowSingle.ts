@@ -4,6 +4,7 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import Stats from "three/addons/libs/stats.module.js";
 import { Intersection } from "three/src/Three.WebGPU.Nodes.js";
 import { RESUME_INTERSECTION } from "../common/constant";
+import { CSS3DObject, CSS3DRenderer } from "three/examples/jsm/Addons.js";
 
 export const windowSingle = createSingle(() => {
   const threeCamera = new THREE.PerspectiveCamera();
@@ -21,8 +22,11 @@ export const windowSingle = createSingle(() => {
   const threeStats = new Stats();
   const threeDom = null as HTMLElement | null;
   const threeModels = new Map<string, THREE.Group<THREE.Object3DEventMap>>();
+  const threeCssRenderer = new CSS3DRenderer();
+  const CSS3DObjects = new Set<CSS3DObject>();
 
   return {
+    threeCssRenderer,
     threeModels,
     threeRaycaster,
     threeStats,
@@ -35,7 +39,19 @@ export const windowSingle = createSingle(() => {
     threeClock,
     threeOrbitControls,
     threeDom,
+    objects: {
+      CSS3DObjects,
+    },
+    worker: {
+      computedWorker: new Worker(
+        new URL("../worker/worker.js", import.meta.url).href,
+        {
+          type: "module",
+        }
+      ),
+    },
     state: {
+      loadedModelSet: new Set<string>(),
       //优化方案，当鼠标不是选中的模式下，不允许intersection去获取射线聚焦的材质内容
       intersectionAble: RESUME_INTERSECTION,
     },

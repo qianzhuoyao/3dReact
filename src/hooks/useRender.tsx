@@ -11,11 +11,16 @@ export const useRender = (
       getWindowSingle().threeScene,
       getWindowSingle().threeCamera
     );
+    getWindowSingle().threeCssRenderer.render(
+      getWindowSingle().threeScene,
+      getWindowSingle().threeCamera
+    );
     getWindowSingle().threeOrbitControls.update();
   }, [renderPlugins]);
 
   useEffect(() => {
     try {
+      getWindowSingle().threeCssRenderer.setSize(width, height);
       getWindowSingle().threeRender.setSize(width, height);
     } catch (e) {
       console.log(e);

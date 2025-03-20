@@ -1,16 +1,18 @@
-import { useMemo } from "react";
-import { useLoad } from "./hooks/useLoad";
+import { useParams } from "react-router-dom";
+import { useModelDetails } from "../hooks/useLoadDetails";
 import { useWindowSize } from "react-use";
-import "./App.css";
+import { useMemo } from "react";
 
-function App() {
+export const ModelDetail = () => {
+  const { id } = useParams(); // 读取 URL 参数
+  console.log(id,'cscscsc');
   const { width, height } = useWindowSize();
   const model = useMemo(
     () => new URL("./model/1.glb", import.meta.url).href,
     []
   );
 
-  const { setRef } = useLoad([model]);
+  const { setRef } = useModelDetails([model]);
 
   return (
     <div
@@ -21,6 +23,4 @@ function App() {
       }}
     ></div>
   );
-}
-
-export default App;
+};

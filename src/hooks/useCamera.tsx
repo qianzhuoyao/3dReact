@@ -20,7 +20,8 @@ export const useCamera = ({ width, height }: Record<string, number>) => {
   }, []);
 
   const lookAt = useCallback((x: number, y: number, z: number) => {
-    getWindowSingle().threeCamera.lookAt(x, y, z);
+    //getWindowSingle().threeCamera.lookAt(x, y, z);
+    getWindowSingle().threeOrbitControls.target.set(x,y,z);
   }, []);
 
   return {
