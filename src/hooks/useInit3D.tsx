@@ -26,7 +26,7 @@ export const useInit3D = () => {
 
   const [mRef, { width, height }] = useMeasure();
   useWindow();
-  useClickModel(width, height);
+  const { clicked } = useClickModel(width, height);
   useControls();
   useScene();
   useDefaultEvent();
@@ -68,23 +68,27 @@ export const useInit3D = () => {
   //目前只允许导入一个模型
   const load = useCallback(
     (
-      modelPath: string[],
+      modelPath: { model: string; tag: string }[],
       callback?: (gltf: GLTF) => void,
       onProgress?: (event: ProgressEvent) => void,
       err?: (e: unknown) => void
     ) => {
       modelPath.forEach((path) => {
+        if (getWindowSingle().state.loadedModelSet.has(path.model)) {
+          return;
+        }
         loader.load(
-          path,
+          path.model,
           function (gltf) {
             const model = gltf.scene;
             getWindowSingle().threeScene.add(model);
             getWindowSingle().threeModels.set(model.uuid, model);
-            callback?.(gltf);
             getWindowSingle().threeRender.setAnimationLoop(renderUpdate);
-
+            gltf.scene.userData.tag = path.tag;
+            getWindowSingle().state.loadedModelSet.add(path.model);
             console.log(model, "model");
             ref.current.loadCount++;
+            callback?.(gltf);
             if (ref.current.loadCount > 1) {
               console.warn(
                 "模型加载次数过多,加载" + ref.current.loadCount + "次"
@@ -115,13 +119,31 @@ export const useInit3D = () => {
     [initDom, mRef]
   );
 
+  const setCurrentModel = useCallback((tag: string[]) => {
+    getWindowSingle().state.currentLoadImportModels.clear();
+    tag.forEach((str) => {
+      getWindowSingle().state.currentLoadImportModels.add(str);
+    });
+    getWindowSingle().threeScene.children.forEach((child) => {
+      if (
+        getWindowSingle().state.currentLoadImportModels.has(child.userData.tag)
+      ) {
+        child.visible = true;
+      } else {
+        child.visible = false;
+      }
+    });
+  }, []);
+
   return {
     setFar,
     setRef,
     width,
+    clicked,
     height,
     load,
     setNear,
+    setCurrentModel,
     setCenter,
     setCameraLookAt,
     setCameraPosition,

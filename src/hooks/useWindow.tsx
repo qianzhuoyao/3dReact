@@ -1,8 +1,11 @@
 import { useEffect } from "react";
-import { windowSingle } from "../window/windowSingle";
+import { getWindowSingle, windowSingle } from "../window/windowSingle";
 
 export const useWindow = () => {
   useEffect(() => {
-    windowSingle();
+    if (getWindowSingle().state.windowLoaded === false) {
+      windowSingle();
+      getWindowSingle().state.windowLoaded = true;
+    }
   }, []);
 };

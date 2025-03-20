@@ -51,6 +51,11 @@ export const windowSingle = createSingle(() => {
       ),
     },
     state: {
+      //当前被加载的模型场景
+      currentLoadImportModels: new Set<string>(),
+      //加载过
+      windowLoaded: false,
+      //已经记载的模型的标记，缓存避免重复加载
       loadedModelSet: new Set<string>(),
       //优化方案，当鼠标不是选中的模式下，不允许intersection去获取射线聚焦的材质内容
       intersectionAble: RESUME_INTERSECTION,
