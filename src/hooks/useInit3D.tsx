@@ -17,6 +17,7 @@ import { checkIntersection } from "../plugins/render/checkIntersection";
 import * as THREE from "three";
 import { cssLabelObject } from "../plugins/render/cssLabelObject";
 import { useClickModel } from "./useClickModel";
+import { worldCab } from "../plugins/render/world";
 
 export const useInit3D = () => {
   const ref = useRef({
@@ -34,6 +35,7 @@ export const useInit3D = () => {
   const animate = useAnimate();
   const { render: renderUpdate } = useRender({ width, height }, [
     checkIntersection,
+    worldCab,
     cssLabelObject,
     ...animate,
   ]);
@@ -85,9 +87,10 @@ export const useInit3D = () => {
             getWindowSingle().threeModels.set(model.uuid, model);
             getWindowSingle().threeRender.setAnimationLoop(renderUpdate);
             gltf.scene.userData.tag = path.tag;
+            gltf.scene.userData.path = path.model;
             getWindowSingle().state.loadedModelSet.add(path.model);
             console.log(model, "model");
-            ref.current.loadCount++;
+
             callback?.(gltf);
             if (ref.current.loadCount > 1) {
               console.warn(
@@ -102,6 +105,7 @@ export const useInit3D = () => {
           }
         );
       });
+      ref.current.loadCount++;
     },
     [loader, renderUpdate]
   );
@@ -125,12 +129,24 @@ export const useInit3D = () => {
       getWindowSingle().state.currentLoadImportModels.add(str);
     });
     getWindowSingle().threeScene.children.forEach((child) => {
+      console.log(child.userData, "child.userData");
       if (
         getWindowSingle().state.currentLoadImportModels.has(child.userData.tag)
       ) {
         child.visible = true;
+
+        if (Array.isArray(child.userData.originScale)) {
+          //保持缩放状态
+          child.scale.set(
+            child.userData.originScale[0],
+            child.userData.originScale[1],
+            child.userData.originScale[2]
+          );
+        }
       } else {
+        // child.userData.originScale = [...child.scale.toArray()];
         child.visible = false;
+        child.scale.set(0, 0, 0);
       }
     });
   }, []);

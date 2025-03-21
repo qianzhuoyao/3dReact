@@ -4,7 +4,12 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import Stats from "three/addons/libs/stats.module.js";
 import { Intersection } from "three/src/Three.WebGPU.Nodes.js";
 import { RESUME_INTERSECTION } from "../common/constant";
-import { CSS3DObject, CSS3DRenderer } from "three/examples/jsm/Addons.js";
+import {
+  CSS3DObject,
+  CSS3DRenderer,
+  Line2,
+} from "three/examples/jsm/Addons.js";
+import * as CANNON from "cannon-es";
 
 export const windowSingle = createSingle(() => {
   const threeCamera = new THREE.PerspectiveCamera();
@@ -25,7 +30,23 @@ export const windowSingle = createSingle(() => {
   const threeCssRenderer = new CSS3DRenderer();
   const CSS3DObjects = new Set<CSS3DObject>();
 
+  const world = new CANNON.World();
+  world.gravity.set(0, -9.82, 0); // 设置重力
+
+  const cableLines = new Map<
+    string,
+    {
+      id: string;
+      fromName: string;
+      targetName: string;
+      from: THREE.Vector3;
+      target: THREE.Vector3;
+      line: Line2;
+    }
+  >();
+
   return {
+    world,
     threeCssRenderer,
     threeModels,
     threeRaycaster,
@@ -40,6 +61,9 @@ export const windowSingle = createSingle(() => {
     threeOrbitControls,
     threeDom,
     objects: {
+      //线缆
+      cableLines,
+      //css3对象
       CSS3DObjects,
     },
     worker: {

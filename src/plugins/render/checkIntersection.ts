@@ -7,14 +7,15 @@ import {
   Object3DEventMap,
 } from "three";
 import { getWindowSingle } from "../../window/windowSingle";
-import { PAUSE_INTERSECTION } from "../../common/constant";
+import {
+  PAUSE_INTERSECTION,
+  selectedTag,
+  unSelectedTag,
+} from "../../common/constant";
 import { createSingle } from "../../common/createSingle";
 import { findModelByCondition } from "../../common/findModelByCondition";
 import { changeObject } from "../../common/changeModelByObject";
 import { CSS3DObject } from "three/examples/jsm/Addons.js";
-
-const selectedTag = new URL("../../assets/tag.png", import.meta.url).href;
-const unSelectedTag = new URL("../../assets/grayTag.png", import.meta.url).href;
 
 const originalMaterials = createSingle(() => {
   return {
@@ -74,6 +75,10 @@ export const checkIntersection = () => {
 
     if (getWindowSingle().threeIntersection.length > 0) {
       const object = getWindowSingle().threeIntersection[0].object;
+
+      if (object.visible === false) {
+        return;
+      }
 
       const parentGroup = findModelByCondition((userData) => {
         if (typeof userData?.name === "string") {

@@ -5,6 +5,7 @@ import { CSS3DObject } from "three/examples/jsm/Addons.js";
 import { getWindowSingle } from "../window/windowSingle";
 import { findModelByCondition } from "../common/findModelByCondition";
 import gsap from "gsap";
+import { createLineByNames } from "../common/createLineByNames";
 /**
  * 加载模型
  * @param models
@@ -96,6 +97,7 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
       }
       return false;
     }, selectedObject);
+    console.log(getWindowSingle().threeScene, "cl");
     console.log("点击了:", parentGroup);
     if (parentGroup?.name) {
       const direction = new THREE.Vector3();
@@ -149,9 +151,12 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
         console.log(gltf, "gltf");
         gltf.scene.position.set(0, 0, 0);
         gltf.scene.scale.set(0.1, 0.1, 0.1);
+        gltf.scene.userData.originScale = [0.1, 0.1, 0.1];
         setCenter(gltf.scene);
         mixTagWithJG(gltf.scene);
         setCurrentModel(["modelA"]);
+        createLineByNames("JF02_JG01", ["JF02_JG10"], [0.1, 1, 0]);
+
         //添加标签
       });
       ref.current.isLoaded = true;
