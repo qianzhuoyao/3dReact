@@ -117,8 +117,8 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
           // gp.position.set(1, 0, 0);
           // doorGroup.position.set(-490, -990, 900);
           doorGroup.parent?.add(gp);
-           gp.position.set(-250,-950,580)
-          doorGroup.position.set(250,0,0)
+           gp.position.set(250,-950,580)
+          doorGroup.position.set(-250,0,0)
           // doorGroup.parent?.position.set(1, 0, 0);
           gp.add(doorGroup);
           getWindowSingle().objects.pivot.set(doorGroup, gp);
@@ -130,7 +130,7 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
           if (ref.current.openDoor) {
             gsap.to(gp.rotation, { y: 0, duration: 1 });
           } else {
-            gsap.to(gp.rotation, { y: -Math.PI , duration: 1 });
+            gsap.to(gp.rotation, { y: Math.PI , duration: 1 });
           }
           ref.current.openDoor = !ref.current.openDoor;
         }
