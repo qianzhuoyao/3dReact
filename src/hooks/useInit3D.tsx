@@ -18,6 +18,7 @@ import * as THREE from "three";
 import { cssLabelObject } from "../plugins/render/cssLabelObject";
 import { useClickModel } from "./useClickModel";
 import { worldCab } from "../plugins/render/world";
+import { useLight } from "./useLight";
 
 export const useInit3D = () => {
   const ref = useRef({
@@ -30,6 +31,7 @@ export const useInit3D = () => {
   const { clicked } = useClickModel(width, height);
   useControls();
   useScene();
+  useLight();
   useDefaultEvent();
   const { initDom } = useInsertDom();
   const animate = useAnimate();

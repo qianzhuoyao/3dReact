@@ -29,6 +29,7 @@ export const windowSingle = createSingle(() => {
   const threeModels = new Map<string, THREE.Group<THREE.Object3DEventMap>>();
   const threeCssRenderer = new CSS3DRenderer();
   const CSS3DObjects = new Set<CSS3DObject>();
+  const threeAmbientLight = new THREE.AmbientLight(0xffffff, 1); // 颜色: 白色, 强度: 1
 
   const world = new CANNON.World();
   world.gravity.set(0, -9.82, 0); // 设置重力
@@ -45,8 +46,11 @@ export const windowSingle = createSingle(() => {
     }
   >();
 
+  const pivot = new WeakMap()
+
   return {
     world,
+    threeAmbientLight,
     threeCssRenderer,
     threeModels,
     threeRaycaster,
@@ -61,6 +65,7 @@ export const windowSingle = createSingle(() => {
     threeOrbitControls,
     threeDom,
     objects: {
+      pivot,
       //线缆
       cableLines,
       //css3对象

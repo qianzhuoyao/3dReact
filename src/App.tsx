@@ -5,6 +5,12 @@ import "./App.css";
 
 function App() {
   const { width, height } = useWindowSize();
+
+  const cabinetAndDeviceModel = useMemo(
+    () => new URL("./model/untitled.glb", import.meta.url).href,
+    []
+  );
+
   const model = useMemo(
     () => new URL("./model/1.glb", import.meta.url).href,
     []
@@ -20,8 +26,8 @@ function App() {
       tag: "modelA",
     },
     {
-      model: modelB,
-      tag: "modelB",
+      model: cabinetAndDeviceModel,
+      tag: "cabinetAndDeviceModel",
     },
   ]);
 

@@ -36,6 +36,8 @@ const originalMaterials = createSingle(() => {
  *
  */
 export const checkIntersection = () => {
+
+
   if (getWindowSingle().state.intersectionAble === PAUSE_INTERSECTION) {
     return;
   }

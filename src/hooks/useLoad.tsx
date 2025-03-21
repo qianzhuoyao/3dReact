@@ -14,6 +14,7 @@ import { createLineByNames } from "../common/createLineByNames";
  */
 export const useLoad = (models: { model: string; tag: string }[]) => {
   const ref = useRef({
+    openDoor: false,
     isLoaded: false,
     currentModel: "modelA",
   });
@@ -91,6 +92,53 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
   clicked(() => {
     const selectedObject = getWindowSingle().threeIntersection[0]
       .object as THREE.Mesh;
+    if (
+      getWindowSingle().state.currentLoadImportModels.has(
+        "cabinetAndDeviceModel"
+      )
+    ) {
+      console.log(selectedObject, "selectedObject");
+      const doorGroup = findModelByCondition((userData) => {
+        if (typeof userData?.name === "string") {
+          return userData?.name.indexOf("门") > -1;
+        }
+        return false;
+      }, selectedObject);
+
+      if (doorGroup) {
+        let gp: THREE.Group | null = null;
+        if (getWindowSingle().objects.pivot.has(doorGroup)) {
+          gp = getWindowSingle().objects.pivot.get(doorGroup);
+        } else {
+          gp = new THREE.Group();
+          // const scene = getWindowSingle().threeScene.children.find(
+          //   (child) => child.userData.tag === "cabinetAndDeviceModel"
+          // );
+          // gp.position.set(1, 0, 0);
+          // doorGroup.position.set(-490, -990, 900);
+          doorGroup.parent?.add(gp);
+           gp.position.set(-250,-950,580)
+          doorGroup.position.set(250,0,0)
+          // doorGroup.parent?.position.set(1, 0, 0);
+          gp.add(doorGroup);
+          getWindowSingle().objects.pivot.set(doorGroup, gp);
+        }
+        // gp?.scale.set(1, 1, 1);
+        // gp.position.x = 10;
+        console.log(doorGroup, "sceness");
+        if (gp) {
+          if (ref.current.openDoor) {
+            gsap.to(gp.rotation, { y: 0, duration: 1 });
+          } else {
+            gsap.to(gp.rotation, { y: -Math.PI , duration: 1 });
+          }
+          ref.current.openDoor = !ref.current.openDoor;
+        }
+      }
+
+      return;
+    }
+
     const parentGroup = findModelByCondition((userData) => {
       if (typeof userData?.name === "string") {
         return userData?.name.indexOf("JG") > -1;
@@ -103,26 +151,30 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
       const direction = new THREE.Vector3();
       getWindowSingle().threeCamera.getWorldDirection(direction); // 获取摄像机的朝向方向（单位向量）
 
-      const position = [...getWindowSingle().threeCamera.position.toArray()];
-
       gsap.to(getWindowSingle().threeCamera.position, {
         x: getWindowSingle().threeCamera.position.x + direction.x * 0.7,
         y: getWindowSingle().threeCamera.position.y + direction.y * 0.7,
         z: getWindowSingle().threeCamera.position.z + direction.z * 0.7,
-        duration: 1,
+        duration: 1.5,
         ease: "power2.out",
         onComplete: () => {
           if (ref.current.currentModel === "modelA") {
-            ref.current.currentModel = "modelB";
+            ref.current.currentModel = "cabinetAndDeviceModel";
+            getWindowSingle().threeScene.children.forEach((child) => {
+              if (child.userData.tag === "cabinetAndDeviceModel") {
+                child.scale.set(0.3, 0.3, 0.3);
+                child.userData.originScale = [0.3, 0.3, 0.3];
+                child.position.set(0, -0.5, 0);
+              }
+            });
           } else {
             ref.current.currentModel = "modelA";
           }
           setCurrentModel([ref.current.currentModel]);
-          // navigate("/ModelDetail/" + parentGroup?.name);
           gsap.to(getWindowSingle().threeCamera.position, {
-            x: position[0],
-            y: position[1],
-            z: position[2],
+            x: -0.22624660155885867,
+            y: 0.6044115994544303,
+            z: 1.1906498404273447,
             duration: 1,
             ease: "power2.out",
           });

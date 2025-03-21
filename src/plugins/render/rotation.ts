@@ -6,5 +6,11 @@ export const rotation = () => {
     return;
   }
 
+  if (
+    getWindowSingle().state.currentLoadImportModels.has("cabinetAndDeviceModel")
+  ) {
+    return;
+  }
+
   getWindowSingle().threeScene.rotation.y += 0.001;
 };
