@@ -6,7 +6,7 @@ export const useRender = (
   renderPlugins?: (() => void)[]
 ) => {
   const render = useCallback(() => {
-    // console.log(getWindowSingle().threeCamera.position, "threeCamera");
+     console.log(getWindowSingle().threeCamera, "threeCamera");
     renderPlugins?.forEach((plugin) => plugin());
     getWindowSingle().threeRender.render(
       getWindowSingle().threeScene,

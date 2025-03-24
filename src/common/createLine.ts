@@ -1,11 +1,6 @@
 import { getWindowSingle } from "../window/windowSingle";
 import * as THREE from "three";
-import {
-  CSS3DObject,
-  Line2,
-  LineGeometry,
-  LineMaterial,
-} from "three/examples/jsm/Addons.js";
+import { CSS3DObject } from "three/examples/jsm/Addons.js";
 import { findModelByCondition } from "./findModelByCondition";
 import { changeObject } from "./changeModelByObject";
 import { selectedTag } from "./constant";
@@ -80,30 +75,65 @@ export const createLine = (
     position: THREE.Vector3;
   }
 ) => {
-  const geometry = new LineGeometry();
-  geometry.setPositions([
-    start.position.x,
-    start.position.y,
-    start.position.z,
-    start.position.x,
-    start.position.y + 0.1,
-    start.position.z,
-    target.position.x,
-    target.position.y + 0.1,
-    target.position.z,
-    target.position.x,
-    target.position.y,
-    target.position.z,
-  ]);
+  const path = new THREE.CurvePath<THREE.Vector3>();
 
-  const matLine = new LineMaterial({
-    linewidth: 5,
-    color: 0x00ff00,
-    dashed: false,
-  });
+  path.add(
+    new THREE.LineCurve3(
+      start.position,
+      new THREE.Vector3(
+        start.position.x,
+        start.position.y + 0.1,
+        start.position.z
+      )
+    )
+  ); // 左侧
+  path.add(
+    new THREE.LineCurve3(
+      new THREE.Vector3(
+        start.position.x,
+        start.position.y + 0.1,
+        start.position.z
+      ),
+      new THREE.Vector3(
+        target.position.x,
+        target.position.y + 0.1,
+        target.position.z
+      )
+    )
+  ); // 上拐点
+  path.add(
+    new THREE.LineCurve3(
+      new THREE.Vector3(
+        target.position.x,
+        target.position.y + 0.1,
+        target.position.z
+      ),
+      target.position
+    )
+  ); // 横向
 
-  const line = new Line2(geometry, matLine);
-  line.scale.set(1, 1, 1);
+  // const curve = new THREE.CatmullRomCurve3([
+  //   start.position,
+  //   new THREE.Vector3(
+  //     start.position.x,
+  //     start.position.y + 0.1,
+  //     start.position.z
+  //   ),
+  //   new THREE.Vector3(
+  //     target.position.x,
+  //     target.position.y + 0.1,
+  //     target.position.z
+  //   ),
+  //   target.position,
+  // ]);
+  const tubeGeometry = new THREE.TubeGeometry(path, 100, 0.016, 8, false);
+
+  const cable = new THREE.Mesh(
+    tubeGeometry,
+    getWindowSingle().objects.batteryMaterial
+  );
+
+  cable.scale.set(1, 1, 1);
   if (start.obj) {
     setColor(start.obj, 0x008000);
     setColor(target.obj, 0x008000);
@@ -113,8 +143,8 @@ export const createLine = (
     id,
     start,
     target,
-    line,
+    line: cable,
   });
 
-  scene.add(line);
+  scene.add(cable);
 };

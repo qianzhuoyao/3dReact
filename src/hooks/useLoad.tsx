@@ -428,10 +428,12 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
                 child.scale.set(0.3, 0.3, 0.3);
                 child.userData.originScale = [0.3, 0.3, 0.3];
                 child.position.set(0, -0.5, 0);
+
                 return;
               }
             });
             //必须把场景旋转恢复下
+
             getWindowSingle().threeScene.rotation.y = 0;
             gsap.to(getWindowSingle().threeCamera.position, {
               x: -0.1,

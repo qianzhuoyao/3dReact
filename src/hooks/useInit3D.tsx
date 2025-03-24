@@ -19,6 +19,7 @@ import { cssLabelObject } from "../plugins/render/cssLabelObject";
 import { useClickModel } from "./useClickModel";
 import { worldCab } from "../plugins/render/world";
 import { useLight } from "./useLight";
+import { battery } from "../plugins/render/battery";
 
 export const useInit3D = () => {
   const ref = useRef({
@@ -39,6 +40,7 @@ export const useInit3D = () => {
     checkIntersection,
     worldCab,
     cssLabelObject,
+    battery,
     ...animate,
   ]);
   useClock();
