@@ -412,7 +412,7 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
     if (parentGroup?.name) {
       const direction = new THREE.Vector3();
       getWindowSingle().threeCamera.getWorldDirection(direction);
-    
+
       gsap.to(getWindowSingle().threeCamera.position, {
         x: getWindowSingle().threeCamera.position.x + direction.x * 0.7,
         y: getWindowSingle().threeCamera.position.y + direction.y * 0.7,
@@ -422,7 +422,15 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
         onComplete: () => {
           if (ref.current.currentModel === "modelA") {
             ref.current.currentModel = "cabinetAndDeviceModel";
-
+            getWindowSingle().threeScene.children.some((child) => {
+              if (child.userData.tag === "cabinetAndDeviceModel") {
+                Object3DRef.current.cabinet = child as THREE.Group;
+                child.scale.set(0.3, 0.3, 0.3);
+                child.userData.originScale = [0.3, 0.3, 0.3];
+                child.position.set(0, -0.5, 0);
+                return;
+              }
+            });
             //必须把场景旋转恢复下
             getWindowSingle().threeScene.rotation.y = 0;
             gsap.to(getWindowSingle().threeCamera.position, {
@@ -497,10 +505,6 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
         createLineByNames("JF02_JG01", ["JF02_JG10"], [0.1, 1, 0]);
 
         if (gltf.scene.userData.tag === "cabinetAndDeviceModel") {
-          Object3DRef.current.cabinet = gltf.scene;
-          gltf.scene.scale.set(0.3, 0.3, 0.3);
-          gltf.scene.userData.originScale = [0.3, 0.3, 0.3];
-          gltf.scene.position.set(0, -0.5, 0);
           initCab(gltf.scene);
         }
 
