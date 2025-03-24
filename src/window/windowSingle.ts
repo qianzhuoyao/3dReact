@@ -13,7 +13,7 @@ import * as CANNON from "cannon-es";
 
 export const windowSingle = createSingle(() => {
   const threeCamera = new THREE.PerspectiveCamera();
-  const threeRender = new THREE.WebGLRenderer({ antialias: true });
+  const threeRender = new THREE.WebGLRenderer({ antialias: true,precision: "highp" });
   const threeScene = new THREE.Scene();
   const threeClock = new THREE.Clock();
   const threePmremGenerator = new THREE.PMREMGenerator(threeRender);
@@ -38,15 +38,19 @@ export const windowSingle = createSingle(() => {
     string,
     {
       id: string;
-      fromName: string;
-      targetName: string;
-      from: THREE.Vector3;
-      target: THREE.Vector3;
+      start: {
+        obj: THREE.Object3D | null;
+        position: THREE.Vector3;
+      };
+      target: {
+        obj: THREE.Object3D;
+        position: THREE.Vector3;
+      };
       line: Line2;
     }
   >();
 
-  const pivot = new WeakMap()
+  const pivot = new WeakMap();
 
   return {
     world,
@@ -80,6 +84,8 @@ export const windowSingle = createSingle(() => {
       ),
     },
     state: {
+      //允许相机旋转
+      rotatable: true,
       //当前被加载的模型场景
       currentLoadImportModels: new Set<string>(),
       //加载过

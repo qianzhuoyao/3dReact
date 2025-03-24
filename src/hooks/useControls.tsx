@@ -9,7 +9,6 @@ export const useControls = () => {
     getWindowSingle().threeOrbitControls.maxPolarAngle = Math.PI / 2; // 最大俯仰角
     getWindowSingle().threeOrbitControls.enablePan = true;
     getWindowSingle().threeOrbitControls.enableDamping = false;
-    // getWindowSingle().threeOrbitControls.screenSpacePanning = false; // 确保是"世界空间"而不是屏幕空间
     getWindowSingle().threeOrbitControls.mouseButtons.RIGHT = THREE.MOUSE.PAN; // 右键平移
     getWindowSingle().threeOrbitControls.mouseButtons.LEFT = THREE.MOUSE.ROTATE; // 左键旋转
     getWindowSingle().threeOrbitControls.update();
