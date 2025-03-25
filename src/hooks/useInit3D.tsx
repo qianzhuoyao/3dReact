@@ -21,6 +21,7 @@ import { worldCab } from "../plugins/render/world";
 import { battery } from "../plugins/render/battery";
 import { useLoadHdr } from "./useLoadHdr";
 import { VISIBLE_WHITE } from "../common/constant";
+import { orbitControlUpdate } from "../plugins/render/orbitControlUpdate";
 
 export const useInit3D = () => {
   const ref = useRef({
@@ -39,6 +40,7 @@ export const useInit3D = () => {
   const { initDom } = useInsertDom();
   const animate = useAnimate();
   const { render: renderUpdate } = useRender({ width, height }, [
+    orbitControlUpdate,
     checkIntersection,
     worldCab,
     cssLabelObject,
@@ -154,7 +156,7 @@ export const useInit3D = () => {
           );
         }
       } else {
-        // child.userData.originScale = [...child.scale.toArray()];
+        child.userData.originScale = [...child.scale.toArray()];
         child.visible = false;
         child.scale.set(0, 0, 0);
       }

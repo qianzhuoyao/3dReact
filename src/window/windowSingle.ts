@@ -117,6 +117,7 @@ export const windowSingle = createSingle(() => {
       ),
     },
     state: {
+      controlUpdate: true,
       //允许相机旋转
       rotatable: true,
       //当前被加载的模型场景

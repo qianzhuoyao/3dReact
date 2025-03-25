@@ -6,8 +6,9 @@ export const useRender = (
   renderPlugins?: (() => void)[]
 ) => {
   const render = useCallback(() => {
-     console.log(getWindowSingle().threeCamera, "threeCamera");
+    console.log(getWindowSingle().threeCamera, "threeCamera");
     renderPlugins?.forEach((plugin) => plugin());
+   // getWindowSingle().threeOrbitControls.update();
     getWindowSingle().threeRender.render(
       getWindowSingle().threeScene,
       getWindowSingle().threeCamera
@@ -17,7 +18,6 @@ export const useRender = (
       getWindowSingle().threeScene,
       getWindowSingle().threeCamera
     );
-    getWindowSingle().threeOrbitControls.update();
   }, [renderPlugins]);
 
   useEffect(() => {
