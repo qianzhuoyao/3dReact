@@ -18,8 +18,9 @@ import * as THREE from "three";
 import { cssLabelObject } from "../plugins/render/cssLabelObject";
 import { useClickModel } from "./useClickModel";
 import { worldCab } from "../plugins/render/world";
-import { useLight } from "./useLight";
 import { battery } from "../plugins/render/battery";
+import { useLoadHdr } from "./useLoadHdr";
+import { VISIBLE_WHITE } from "../common/constant";
 
 export const useInit3D = () => {
   const ref = useRef({
@@ -32,7 +33,8 @@ export const useInit3D = () => {
   const { clicked } = useClickModel(width, height);
   useControls();
   useScene();
-  useLight();
+  // useLight();
+  useLoadHdr();
   useDefaultEvent();
   const { initDom } = useInsertDom();
   const animate = useAnimate();
@@ -133,6 +135,10 @@ export const useInit3D = () => {
       getWindowSingle().state.currentLoadImportModels.add(str);
     });
     getWindowSingle().threeScene.children.forEach((child) => {
+      if (VISIBLE_WHITE.includes(child.userData.tag)) {
+        return;
+      }
+
       console.log(child.userData, "child.userData");
       if (
         getWindowSingle().state.currentLoadImportModels.has(child.userData.tag)

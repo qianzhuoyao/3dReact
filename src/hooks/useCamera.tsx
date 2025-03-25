@@ -4,6 +4,7 @@ import { useCallback, useEffect } from "react";
 export const useCamera = ({ width, height }: Record<string, number>) => {
   useEffect(() => {
     getWindowSingle().threeCamera.aspect = width / height;
+    // getWindowSingle().threeCamera.fov = 60;
     getWindowSingle().threeCamera.updateProjectionMatrix();
   }, [height, width]);
   //5,2,8
@@ -20,8 +21,8 @@ export const useCamera = ({ width, height }: Record<string, number>) => {
   }, []);
 
   const lookAt = useCallback((x: number, y: number, z: number) => {
-    //getWindowSingle().threeCamera.lookAt(x, y, z);
-    getWindowSingle().threeOrbitControls.target.set(x,y,z);
+    getWindowSingle().threeCamera.lookAt(x, y, z);
+  
   }, []);
 
   return {

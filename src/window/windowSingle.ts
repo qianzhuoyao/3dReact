@@ -4,7 +4,11 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import Stats from "three/addons/libs/stats.module.js";
 import { Intersection } from "three/src/Three.WebGPU.Nodes.js";
 import { RESUME_INTERSECTION } from "../common/constant";
-import { CSS3DObject, CSS3DRenderer } from "three/examples/jsm/Addons.js";
+import {
+  CSS3DObject,
+  CSS3DRenderer,
+  RGBELoader,
+} from "three/examples/jsm/Addons.js";
 import * as CANNON from "cannon-es";
 
 export const windowSingle = createSingle(() => {
@@ -29,6 +33,9 @@ export const windowSingle = createSingle(() => {
   const threeCssRenderer = new CSS3DRenderer();
   const CSS3DObjects = new Set<CSS3DObject>();
   const threeAmbientLight = new THREE.AmbientLight(0xffffff, 1); // 颜色: 白色, 强度: 1
+
+  const threeRgbeLoader = new RGBELoader();
+
   const png = new URL("../assets/battery.png", import.meta.url).href;
 
   const textureLoader = new THREE.TextureLoader();
@@ -77,6 +84,7 @@ export const windowSingle = createSingle(() => {
 
   return {
     world,
+    threeRgbeLoader,
     threeAmbientLight,
     threeCssRenderer,
     threeModels,
