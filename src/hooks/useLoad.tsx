@@ -403,9 +403,8 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
 
       return;
     } else {
-      getWindowSingle().threeOrbitControls.target.set(0, 0, 0);
-      getWindowSingle().state.controlUpdate = false;
-      getWindowSingle().threeOrbitControls.enabled = false;
+      // getWindowSingle().state.controlUpdate = false;
+      // getWindowSingle().threeOrbitControls.enabled = false;
       const parentGroup = findModelByCondition((userData) => {
         if (typeof userData?.name === "string") {
           return userData?.name.indexOf("JG") > -1;
@@ -428,19 +427,12 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
             if (ref.current.currentModel === "modelA") {
               ref.current.currentModel = "cabinetAndDeviceModel";
 
-              getWindowSingle().threeScene.children.some((child) => {
-                if (child.userData.tag === "cabinetAndDeviceModel") {
-                  Object3DRef.current.cabinet = child as THREE.Group;
-                  child.scale.set(0.3, 0.3, 0.3);
-                  child.userData.originScale = [0.3, 0.3, 0.3];
-                  child.position.set(0, 0, 0);
-                  return;
-                }
-              });
               //必须把场景旋转恢复下
 
               getWindowSingle().threeScene.rotation.y = 0;
-
+              getWindowSingle().threeOrbitControls.target.set(0, 0, 0);
+              setCurrentModelState([ref.current.currentModel]);
+              setCurrentModel([ref.current.currentModel]);
               gsap.to(getWindowSingle().threeCamera.position, {
                 x: Object3DRef.current.originCamera?.position.toArray()[0],
                 y: Object3DRef.current.originCamera?.position.toArray()[1],
@@ -454,39 +446,45 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
                   );
 
                   if (Object3DRef.current.originCamera) {
-                    getWindowSingle().threeCamera.copy(
-                      Object3DRef.current.originCamera
-                    );
+                    // getWindowSingle().threeCamera.copy(
+                    //   Object3DRef.current.originCamera
+                    // );
                     getWindowSingle().threeCamera.updateMatrixWorld(true);
                     getWindowSingle().threeCamera.updateMatrix();
-                    // getWindowSingle().threeOrbitControls.update();
-                    getWindowSingle().state.controlUpdate = true;
-                    getWindowSingle().threeOrbitControls.enabled = true;
-                  }
+                    getWindowSingle().threeOrbitControls.update();
+                    // getWindowSingle().state.controlUpdate = true;
+                    // getWindowSingle().threeOrbitControls.enabled = true;
 
-                  if (Object3DRef.current.door) {
-                    const gp = getWindowSingle().objects.pivot.get(
-                      Object3DRef.current.door
-                    );
-                    //显示当前机柜下的设备
-                    addDevice([
-                      {
-                        name: "1",
-                      },
-                      {
-                        name: "2",
-                      },
-                      {
-                        name: "3",
-                      },
-                    ]);
-                    openDoor(gp);
+                    getWindowSingle().threeScene.children.some((child) => {
+                      if (child.userData.tag === "cabinetAndDeviceModel") {
+                        Object3DRef.current.cabinet = child as THREE.Group;
+                        setCabinetAndDeviceModelAttr(child);
+                        return;
+                      }
+                    });
+
+                    if (Object3DRef.current.door) {
+                      const gp = getWindowSingle().objects.pivot.get(
+                        Object3DRef.current.door
+                      );
+                      //显示当前机柜下的设备
+                      addDevice([
+                        {
+                          name: "1",
+                        },
+                        {
+                          name: "2",
+                        },
+                        {
+                          name: "3",
+                        },
+                      ]);
+                      openDoor(gp);
+                    }
                   }
                 },
               });
             }
-            setCurrentModelState([ref.current.currentModel]);
-            setCurrentModel([ref.current.currentModel]);
           },
         });
 
@@ -494,6 +492,12 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
       }
     }
   });
+
+  const setCabinetAndDeviceModelAttr = useCallback((obj: THREE.Object3D) => {
+    obj.scale.set(0.3, 0.3, 0.3);
+    obj.userData.originScale = [0.3, 0.3, 0.3];
+    obj.position.set(0, 0, 0);
+  }, []);
 
   //初始的一些设置
   useEffect(() => {
@@ -517,7 +521,7 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
         setCenter(gltf.scene);
         mixTagWithJG(gltf.scene);
         setCurrentModelState(["modelA"]);
-        setCurrentModel(["modelA"]);
+
         createLineByNames("JF02_JG01", ["JF02_JG10"], [0.1, 1, 0]);
 
         Object3DRef.current.originCamera =
@@ -525,8 +529,9 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
 
         if (gltf.scene.userData.tag === "cabinetAndDeviceModel") {
           initCab(gltf.scene);
+          setCabinetAndDeviceModelAttr(gltf.scene);
         }
-
+        setCurrentModel(["modelA"]);
         //添加标签
       });
       ref.current.isLoaded = true;
@@ -543,6 +548,7 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
     setCurrentModel,
     setFar,
     setNear,
+    setCabinetAndDeviceModelAttr,
   ]);
 
   return {

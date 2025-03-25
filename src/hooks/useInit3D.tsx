@@ -158,6 +158,7 @@ export const useInit3D = () => {
       } else {
         child.userData.originScale = [...child.scale.toArray()];
         child.visible = false;
+
         child.scale.set(0, 0, 0);
       }
     });
