@@ -117,18 +117,25 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
     ref.current.openDoor = false;
   }, []);
   const addDevice = useCallback(
-    (deviceList: { name: string; content: string[]; lines: string[] }[]) => {
+    (
+      deviceList: {
+        name: string;
+        content: string[];
+        floor: number;
+        lines: string[];
+      }[]
+    ) => {
       if (
         getWindowSingle().state.currentLoadImportModels.has(
           "cabinetAndDeviceModel"
         )
       ) {
         if (Object3DRef.current.cabinet) {
-          deviceList.forEach((device, index) => {
+          deviceList.forEach((device) => {
             if (
               Object3DRef.current.allCloneDeviceList.some(
                 (deviceItem) =>
-                  deviceItem.userData.tag === getSubDeviceTag(index)
+                  deviceItem.userData.tag === getSubDeviceTag(device.floor)
               )
             ) {
               return;
@@ -155,6 +162,7 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
                   child.children.some((item) => {
                     if (item.userData.name === "线") {
                       item.children.forEach((lineMesh) => {
+                        lineMesh.userData.floor = device.floor;
                         if (device.lines.includes(lineMesh.userData.name)) {
                           lineMesh.layers.set(0);
                           lineMesh.visible = true;
@@ -182,16 +190,20 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
             if (cloneDevice) {
               cloneDevice.userData.belong = "device";
               cloneDevice.visible = true;
-              cloneDevice.userData.tag = getSubDeviceTag(index);
+              cloneDevice.userData.tag = getSubDeviceTag(device.floor);
               cloneDevice.position.set(0.65, -0.34, -0.55);
               cloneDevice.name = device.name;
               Object3DRef.current.allCloneDeviceList.push(cloneDevice);
               cloneLineDevice?.add(cloneDevice);
               Object3DRef.current.showLines.set(cloneDevice, lineMeshMapList);
             }
-            lineDeviceGroup.userData.tag = index;
+            lineDeviceGroup.userData.tag = device.floor;
             lineDeviceGroup.scale.set(1, 0.8, 1);
-            lineDeviceGroup.position.set(-0.63, deviceLevel[index], 0.89);
+            lineDeviceGroup.position.set(
+              -0.63,
+              deviceLevel[device.floor],
+              0.89
+            );
             Object3DRef.current.cabinet?.add(lineDeviceGroup);
           });
         }
@@ -551,16 +563,19 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
                       addDevice([
                         {
                           name: "1",
+                          floor: 1,
                           //暂无效
                           content: ["top", "bottom", "center"],
                           lines: ["1", "48"],
                         },
                         {
+                          floor: 0,
                           name: "2",
                           lines: [],
                           content: ["top", "bottom", "center"],
                         },
                         {
+                          floor: 2,
                           lines: ["1", "2", "3", "4", "5", "6", "34"],
                           name: "3",
                           content: ["bottom"],
