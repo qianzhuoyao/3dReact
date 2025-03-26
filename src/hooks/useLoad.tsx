@@ -15,6 +15,11 @@ import { selectedTag, unSelectedTag } from "../common/constant";
  *
  */
 
+export const deviceLevel = [
+  0.25, 0.4, 0.51, 0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7,
+  1.8, 1.9, 2, 2.1, 2.2,
+];
+
 const getSubDeviceTag = (index: number) => {
   return index + "sub-device";
 };
@@ -185,11 +190,8 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
               Object3DRef.current.showLines.set(cloneDevice, lineMeshMapList);
             }
             lineDeviceGroup.userData.tag = index;
-            lineDeviceGroup.position.set(
-              -0.63,
-              0.21 + (index + 1) * 0.11,
-              0.89
-            );
+            lineDeviceGroup.scale.set(1, 0.8, 1);
+            lineDeviceGroup.position.set(-0.63, deviceLevel[index], 0.89);
             Object3DRef.current.cabinet?.add(lineDeviceGroup);
           });
         }
