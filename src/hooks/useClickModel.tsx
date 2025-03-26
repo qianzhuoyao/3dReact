@@ -13,7 +13,7 @@ export const useClickModel = (width: number, height: number) => {
   useEffect(() => {
     const subscription = upSubscribe(window, (e) => e).subscribe((e) => {
       console.log(e, "点击了:wqeq");
-      if (e && e.button === 0) {
+      if (e) {
         getWindowSingle().threeMouse.x = (e.clientX / width) * 2 - 1;
         getWindowSingle().threeMouse.y = -(e.clientY / height) * 2 + 1;
 
