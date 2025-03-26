@@ -12,6 +12,11 @@ function App() {
     []
   );
 
+  const lineDevice = useMemo(
+    () => new URL("./model/lineDevice.glb", import.meta.url).href,
+    []
+  );
+
   const model = useMemo(
     () => new URL("./model/1.glb", import.meta.url).href,
     []
@@ -21,16 +26,21 @@ function App() {
   //   []
   // );
 
-  const { setRef, back, currentModelState, setRotatable, showTag,showCable } = useLoad([
-    {
-      model,
-      tag: "modelA",
-    },
-    {
-      model: cabinetAndDeviceModel,
-      tag: "cabinetAndDeviceModel",
-    },
-  ]);
+  const { setRef, back, currentModelState, setRotatable, showTag, showCable } =
+    useLoad([
+      {
+        model,
+        tag: "modelA",
+      },
+      {
+        model: lineDevice,
+        tag: "lineDevice",
+      },
+      {
+        model: cabinetAndDeviceModel,
+        tag: "cabinetAndDeviceModel",
+      },
+    ]);
 
   const onHandleBack = useCallback(() => {
     back();

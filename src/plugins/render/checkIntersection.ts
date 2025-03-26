@@ -36,13 +36,13 @@ const originalMaterials = createSingle(() => {
  *
  */
 export const checkIntersection = () => {
-
-
   if (getWindowSingle().state.intersectionAble === PAUSE_INTERSECTION) {
     return;
   }
 
   try {
+    // getWindowSingle().threeRaycaster.layers.set(1);
+
     getWindowSingle().threeRaycaster.setFromCamera(
       getWindowSingle().threeMouse,
       getWindowSingle().threeCamera
