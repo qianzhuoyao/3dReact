@@ -22,6 +22,9 @@ import { battery } from "../plugins/render/battery";
 import { useLoadHdr } from "./useLoadHdr";
 import { VISIBLE_WHITE } from "../common/constant";
 import { orbitControlUpdate } from "../plugins/render/orbitControlUpdate";
+import { useSetInstanceId } from "./useSetInstanceId";
+import { usePolling } from "./usePolling";
+import { asyncAlert } from "../plugins/request/asyncAlert";
 
 export const useInit3D = () => {
   const ref = useRef({
@@ -37,6 +40,10 @@ export const useInit3D = () => {
   // useLight();
   useLoadHdr();
   useDefaultEvent();
+
+  usePolling([asyncAlert]);
+  useSetInstanceId();
+
   const { initDom } = useInsertDom();
   const animate = useAnimate();
   const { render: renderUpdate } = useRender({ width, height }, [

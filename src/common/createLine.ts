@@ -1,7 +1,5 @@
 import { getWindowSingle } from "../window/windowSingle";
 import * as THREE from "three";
-import { CSS3DObject } from "three/examples/jsm/Addons.js";
-import { findModelByCondition } from "./findModelByCondition";
 import { changeObject } from "./changeModelByObject";
 import { selectedTag } from "./constant";
 
@@ -9,58 +7,33 @@ export const setColor = (
   object: THREE.Object3D<THREE.Object3DEventMap>,
   color: number
 ) => {
-  try {
-    const dfs = (obj: THREE.Object3D<THREE.Object3DEventMap>) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      obj?.children?.forEach((child: any) => {
-        const parentGroup = findModelByCondition((userData) => {
-          if (typeof userData?.name === "string") {
-            return userData?.name.indexOf("JG") > -1;
-          }
-          return false;
-        }, child);
-
-        if (parentGroup) {
-          const cssTagObject = parentGroup.parent?.children.find(
-            (o) => o instanceof CSS3DObject
-          );
-
-          if (
-            cssTagObject &&
-            cssTagObject.element.firstElementChild instanceof HTMLDivElement
-          ) {
-            cssTagObject.element.firstElementChild.style.backgroundImage = `url(${selectedTag})`;
-          }
-          parentGroup.userData.bindCssTagObject = cssTagObject;
-          changeObject(parentGroup, (t) => {
-            const material = t.material;
-
-            if (material instanceof THREE.MeshStandardMaterial) {
-              const cloneMaterial = material.clone();
-              const cloneMaterial2 = material.clone();
-
-              if (!t.userData.originalCableOriginMaterial) {
-                t.userData.originalCableOriginMaterial = cloneMaterial;
-              }
-
-              t.material = cloneMaterial2;
-              cloneMaterial2.emissive.set(color);
-              t.userData.clonedCableOriginMaterial = cloneMaterial2;
-              console.log(cloneMaterial, cloneMaterial2, "cloneMaterial");
-            }
-          });
-        }
-
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        child?.children?.forEach((element: any) => {
-          dfs(element);
-        });
-      });
-    };
-    dfs(object);
-  } catch (e) {
-    console.error(e);
+  const cssTagObject = object.userData.bindCssTagObject;
+  if (
+    cssTagObject &&
+    cssTagObject.element.firstElementChild instanceof HTMLDivElement
+  ) {
+    cssTagObject.userData.tipType = "select";
+    cssTagObject.element.firstElementChild.style.backgroundImage = `url(${selectedTag})`;
+    cssTagObject.userData.originMaterialImage = `url(${selectedTag})`;
   }
+
+  changeObject(object, (t) => {
+    const material = t.material;
+
+    if (material instanceof THREE.MeshStandardMaterial) {
+      const cloneMaterial = material.clone();
+      const cloneMaterial2 = material.clone();
+
+      if (!t.userData.originalCableOriginMaterial) {
+        t.userData.originalCableOriginMaterial = cloneMaterial;
+      }
+
+      t.material = cloneMaterial2;
+      cloneMaterial2.emissive.set(color);
+      t.userData.clonedCableOriginMaterial = cloneMaterial2;
+      console.log(cloneMaterial, cloneMaterial2, "cloneMaterial");
+    }
+  });
 };
 
 export const createLine = (

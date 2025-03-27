@@ -7,11 +7,7 @@ import {
   Object3DEventMap,
 } from "three";
 import { getWindowSingle } from "../../window/windowSingle";
-import {
-  PAUSE_INTERSECTION,
-  selectedTag,
-  unSelectedTag,
-} from "../../common/constant";
+import { PAUSE_INTERSECTION, selectedTag } from "../../common/constant";
 import { createSingle } from "../../common/createSingle";
 import { findModelByCondition } from "../../common/findModelByCondition";
 import { changeObject } from "../../common/changeModelByObject";
@@ -55,7 +51,10 @@ export const checkIntersection = () => {
 
     originalMaterials()?.cssTagObjects.forEach((tag) => {
       if (tag.element.firstElementChild instanceof HTMLDivElement) {
-        tag.element.firstElementChild.style.backgroundImage = `url(${unSelectedTag})`;
+        if (tag.userData.tipType === "show") {
+          tag.element.firstElementChild.style.backgroundImage =
+            tag.userData.originMaterialImage;
+        }
         originalMaterials()?.cssTagObjects.delete(tag);
       }
     });
@@ -98,8 +97,10 @@ export const checkIntersection = () => {
           cssTagObject &&
           cssTagObject.element.firstElementChild instanceof HTMLDivElement
         ) {
-          cssTagObject.element.firstElementChild.style.backgroundImage = `url(${selectedTag})`;
-          originalMaterials()?.cssTagObjects.add(cssTagObject);
+          if (cssTagObject.userData.tipType === "show") {
+            cssTagObject.element.firstElementChild.style.backgroundImage = `url(${selectedTag})`;
+            originalMaterials()?.cssTagObjects.add(cssTagObject);
+          }
         }
 
         changeObject(parentGroup, (target) => {
@@ -109,18 +110,20 @@ export const checkIntersection = () => {
           if (material instanceof MeshStandardMaterial) {
             if (!originalMaterials()?.materials.has(target)) {
               originalMaterials()?.origins.add(target);
-              originalMaterials()?.materials.set(target, material.clone()); // 克隆原材质
+              originalMaterials()?.materials.set(target, material.clone());
             }
             const cloneMaterial = material.clone();
 
             if (Array.isArray(target.material)) {
-              target.userData.originalMaterial = target.material[0]; // 存储原始材质
+              target.userData.originalMaterial = target.material[0];
               target.material[0] = cloneMaterial;
             } else {
-              target.userData.originalMaterial = target.material; // 存储原始材质
+              target.userData.originalMaterial = target.material;
               target.material = cloneMaterial;
             }
-
+            if (cloneMaterial.userData.materialType === "alert") {
+              return;
+            }
             cloneMaterial.emissive.set(0x008000);
           }
         });

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useInit3D } from "./useInit3D";
 import * as THREE from "three";
 import { CSS3DObject } from "three/examples/jsm/Addons.js";
@@ -346,16 +346,12 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
     return labelDiv;
   }, []);
 
-  const tagUrl = useMemo(() => {
-    return new URL("../assets/grayTag.png", import.meta.url).href;
-  }, []);
-
   const mix = useCallback(
     (object: THREE.Object3D, scene: THREE.Object3D) => {
       const group = new THREE.Group();
       const tag = createTag();
       tag.innerHTML = ` <div class="tag-content" style="
-     background-image: url(${tagUrl});
+     background-image: url(${unSelectedTag});
       "> 
       <div class="tag-text">${object.userData.name}</div>
       </div>`;
@@ -367,11 +363,18 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
       group.add(label);
       group.add(object);
       group.userData.type = "tag-group";
+      group.userData.inBindCssTagObject = label;
+      group.userData.inMixObject = object;
+      label.userData.tipType = "show"; // show 展示 ，select 选中 alert 警告
+      object.userData.bindCssTagObject = label;
       label.userData.mixBy = object.userData.name;
+      label.userData.mixObject = object;
+      //设置默认状态
+      label.userData.originMaterialImage = `url(${unSelectedTag})`;
       group.userData.objectName = object.userData.name;
       scene.add(group);
     },
-    [createTag, tagUrl]
+    [createTag]
   );
 
   //查找机柜，并创建tag
