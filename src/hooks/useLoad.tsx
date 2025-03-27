@@ -8,12 +8,43 @@ import gsap from "gsap";
 import { createLineByNames } from "../common/createLineByNames";
 import { changeObject } from "../common/changeModelByObject";
 import { selectedTag, unSelectedTag } from "../common/constant";
+import { createSingle } from "../common/createSingle";
 /**
  * 加载模型
  * @param models
  * @returns
  *
  */
+
+export const LineRelationMap = createSingle(() => {
+  return {
+    relation: new Map<string, THREE.Object3D>(),
+  };
+});
+
+//线路对应关系
+export const lineMap = [
+  {
+    start: {
+      floor: 1,
+      name: "1",
+    },
+    target: {
+      floor: 1,
+      name: "48",
+    },
+  },
+  {
+    start: {
+      floor: 1,
+      name: "48",
+    },
+    target: {
+      floor: 1,
+      name: "1",
+    },
+  },
+];
 
 export const deviceLevel = [
   0.25, 0.4, 0.51, 0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7,
@@ -54,6 +85,7 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
     device: null | THREE.Object3D;
     cabinet: null | THREE.Group;
     allCloneDeviceList: THREE.Object3D[];
+
     originCamera: THREE.PerspectiveCamera | null;
     lineDevice: THREE.Group | null;
     showLines: WeakMap<THREE.Object3D, THREE.Object3D[]>;
@@ -163,16 +195,20 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
                     if (item.userData.name === "线") {
                       item.children.forEach((lineMesh) => {
                         lineMesh.userData.floor = device.floor;
+                        // lineMesh.userData.aboutPortLines=lineMap.filter(line=>{
+
+                        // })
+
+                        lineMesh.userData.meshType = "line";
                         if (device.lines.includes(lineMesh.userData.name)) {
                           lineMesh.layers.set(0);
                           lineMesh.visible = true;
+                          // lineMesh.userData.lineCode
                           lineMeshMapList.push(lineMesh);
-
-                          // cloneMesh.scale.set(
-                          //   lineMesh.userData.scale[0] || 1,
-                          //   lineMesh.userData.scale[1] || 1,
-                          //   lineMesh.userData.scale[2] || 1
-                          // );
+                          LineRelationMap()?.relation.set(
+                            device.floor + lineMesh.userData.name,
+                            lineMesh
+                          );
                         } else {
                           lineMesh.layers.set(2);
                           lineMesh.visible = false;
@@ -195,6 +231,7 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
               cloneDevice.name = device.name;
               Object3DRef.current.allCloneDeviceList.push(cloneDevice);
               cloneLineDevice?.add(cloneDevice);
+
               Object3DRef.current.showLines.set(cloneDevice, lineMeshMapList);
             }
             lineDeviceGroup.userData.tag = device.floor;
