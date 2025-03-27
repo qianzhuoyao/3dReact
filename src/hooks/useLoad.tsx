@@ -7,53 +7,16 @@ import { findModelByCondition } from "../common/findModelByCondition";
 import gsap from "gsap";
 import { createLineByNames } from "../common/createLineByNames";
 import { changeObject } from "../common/changeModelByObject";
-import { selectedTag, unSelectedTag } from "../common/constant";
-import { createSingle } from "../common/createSingle";
+import { deviceLevel, selectedTag, unSelectedTag } from "../common/constant";
+
+import { getSubDeviceTag } from "../common/getSubDeviceTag";
+import { LineRelationMap } from "../common/LineRelationMap";
 /**
  * 加载模型
  * @param models
  * @returns
  *
  */
-
-export const LineRelationMap = createSingle(() => {
-  return {
-    relation: new Map<string, THREE.Object3D>(),
-  };
-});
-
-//线路对应关系
-export const lineMap = [
-  {
-    start: {
-      floor: 1,
-      name: "1",
-    },
-    target: {
-      floor: 1,
-      name: "48",
-    },
-  },
-  {
-    start: {
-      floor: 1,
-      name: "48",
-    },
-    target: {
-      floor: 1,
-      name: "1",
-    },
-  },
-];
-
-export const deviceLevel = [
-  0.25, 0.4, 0.51, 0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7,
-  1.8, 1.9, 2, 2.1, 2.2,
-];
-
-const getSubDeviceTag = (index: number) => {
-  return index + "sub-device";
-};
 
 export const useLoad = (models: { model: string; tag: string }[]) => {
   const [currentModelState, setCurrentModelState] = useState<string[]>([

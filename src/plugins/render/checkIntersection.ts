@@ -8,12 +8,12 @@ import {
   Object3DEventMap,
 } from "three";
 import { getWindowSingle } from "../../window/windowSingle";
-import { PAUSE_INTERSECTION, selectedTag } from "../../common/constant";
+import { lineMap, PAUSE_INTERSECTION, selectedTag } from "../../common/constant";
 import { createSingle } from "../../common/createSingle";
 import { findModelByCondition } from "../../common/findModelByCondition";
 import { changeObject } from "../../common/changeModelByObject";
 import { CSS3DObject } from "three/examples/jsm/Addons.js";
-import { lineMap, LineRelationMap } from "../../hooks/useLoad";
+import { LineRelationMap } from "../../common/LineRelationMap";
 
 const originalMaterials = createSingle(() => {
   return {
