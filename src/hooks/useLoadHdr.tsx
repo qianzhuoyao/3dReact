@@ -5,7 +5,7 @@ import * as THREE from "three";
 export const useLoadHdr = () => {
   const hdr = useMemo(() => {
     return new URL(
-      "../assets/环境12.hdr",
+      "../assets/8988877_d3e48cee78d89278a32831bd57adf496.hdr",
       import.meta.url
     ).href;
   }, []);

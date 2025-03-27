@@ -1,11 +1,29 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useLoad } from "./hooks/useLoad";
 import { useWindowSize } from "react-use";
 import { Switch } from "@heroui/switch";
 import "./App.css";
 import { HeroUIProvider } from "@heroui/react";
+import * as echarts from "echarts";
+import leftTitle from "./assets/智慧机房可视化运维平台/标题框.png";
+import rightTitle from "./assets/智慧机房可视化运维平台/标题2.png";
+import leftBg from "./assets/智慧机房可视化运维平台/背景.png";
+import title from "./assets/智慧机房可视化运维平台/智慧机房可视化运维平台.png";
+import leftTitleIcon from "./assets/智慧机房可视化运维平台/图标1.png";
+import rightTitleIcon from "./assets/智慧机房可视化运维平台/Group 1321316521.png";
+
+import wd from "./assets/智慧机房可视化运维平台/温度.png";
+import cpu from "./assets/智慧机房可视化运维平台/CPU.png";
+import mem from "./assets/智慧机房可视化运维平台/内存.png";
+import delay from "./assets/智慧机房可视化运维平台/延时.png";
+
+import alertTime from "./assets/智慧机房可视化运维平台/告警时间.png";
+import alertCount from "./assets/智慧机房可视化运维平台/告警总数.png";
+
 function App() {
   const { width, height } = useWindowSize();
+
+  const chart = useRef(null);
 
   const cabinetAndDeviceModel = useMemo(
     () => new URL("./model/untitled.glb", import.meta.url).href,
@@ -42,6 +60,43 @@ function App() {
       },
     ]);
 
+  useEffect(() => {
+    console.log(chart, "chart");
+    if (chart.current) {
+      const myChart = echarts.init(chart.current);
+      const option = {
+        tooltip: {
+          trigger: "item",
+        },
+        legend: {
+          show: false,
+          // top: "5%",
+          // left: "center",
+        },
+        series: [
+          {
+            name: "Access From",
+            type: "pie",
+            radius: ["40%", "70%"],
+
+            // adjust the start and end angle
+            startAngle: 0,
+            endAngle: 360,
+            data: [
+              { value: 1048, name: "信息" },
+              { value: 735, name: "告警" },
+              { value: 580, name: "一般" },
+              { value: 484, name: "严重" },
+              { value: 300, name: "紧急" },
+            ],
+          },
+        ],
+      };
+
+      myChart.setOption(option);
+    }
+  }, [currentModelState]);
+
   const onHandleBack = useCallback(() => {
     back();
   }, [back]);
@@ -49,10 +104,18 @@ function App() {
   return (
     <HeroUIProvider>
       <div
+        className="w-full absolute top-0 left-0"
+        style={{
+          height: "80px",
+        }}
+      >
+        <img src={title} alt="" className="w-full h-full" />
+      </div>
+      <div
         style={{
           position: "absolute",
-          top: "10px",
-          left: "10px",
+          top: "100px",
+          left: "40px",
         }}
       >
         {currentModelState.includes("cabinetAndDeviceModel") ? (
@@ -203,6 +266,359 @@ function App() {
           )}
         </div>
       </div>
+
+      {currentModelState.includes("cabinetAndDeviceModel") ? (
+        <div
+          className="absolute w-full h-full"
+          style={{
+            pointerEvents: "none",
+          }}
+        >
+          <div
+            className="relative"
+            style={{
+              width: "100%",
+              height: "100%",
+            }}
+          >
+            <div
+              className="absolute"
+              style={{
+                backgroundImage: `url(${leftBg})`,
+                backgroundSize: "100% 100%",
+                left: "200px",
+                width: "300px",
+                height: "fit-content",
+                top: "30%",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  paddingLeft: "10px",
+                  alignItems: "center",
+                  backgroundImage: `url(${leftTitle})`,
+                  backgroundSize: "100% 100%",
+                  width: "100%",
+                  height: "50px",
+                }}
+              >
+                <img
+                  src={leftTitleIcon}
+                  style={{
+                    width: "30px",
+                    height: "30px",
+                  }}
+                ></img>
+                <span
+                  style={{
+                    paddingLeft: "5px",
+                    color: "#f7e4e0",
+                  }}
+                >
+                  设备基础信息
+                </span>
+              </div>
+
+              <div
+                style={{
+                 
+                  padding: "10px",
+                }}
+              >
+                {[
+                  {
+                    label: "基础设备信息",
+                    value: "ccc-s0-1",
+                  },
+                  {
+                    label: "设备类型",
+                    value: "服务器",
+                  },
+                  {
+                    label: "设备IP地址",
+                    value: "18.15.1.1",
+                  },
+                  {
+                    label: "制造商",
+                    value: "浪潮",
+                  },
+                  {
+                    label: "设备信息",
+                    value: "CS402",
+                  },
+                  {
+                    label: "设备序列号",
+                    value: "12033-01454",
+                  },
+                  {
+                    label: "设备高度",
+                    value: "1",
+                  },
+                  {
+                    label: "所属机柜",
+                    value: "1-1",
+                  },
+                  {
+                    label: "安装u位",
+                    value: "25",
+                  },
+                ].map((item) => {
+                  return (
+                    <div key={item.label}>
+                      <span
+                        style={{
+                          color: "rgba(255,255,255,0.7)",
+                        }}
+                      >
+                        {item.label}
+                      </span>
+                      :
+                      <span
+                        style={{
+                          paddingLeft: "10px",
+                          color: "rgba(255,255,255,1)",
+                        }}
+                      >
+                        {item.value}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+            <div
+              className="absolute"
+              style={{
+                backgroundImage: `url(${leftBg})`,
+                backgroundSize: "100% 100%",
+                right: "200px",
+                width: "400px",
+                height: "fit-content",
+                top: "10%",
+              }}
+            >
+              <div
+                style={{
+                  
+                  display: "flex",
+                  paddingLeft: "10px",
+                  alignItems: "center",
+                  backgroundImage: `url(${rightTitle})`,
+                  backgroundSize: "100% 100%",
+                  width: "100%",
+                  height: "50px",
+                }}
+              >
+                <img
+                  src={rightTitleIcon}
+                  style={{
+                    width: "30px",
+                    height: "30px",
+                  }}
+                ></img>
+                <span
+                  style={{
+                    paddingLeft: "5px",
+                    color: "#f7e4e0",
+                  }}
+                >
+                  指标信息
+                </span>
+              </div>
+              <div
+                style={{
+                 
+                  padding: "10px",
+                  display: "flex",
+                  flexWrap: "wrap",
+                }}
+              >
+                {[
+                  {
+                    label: "CPU",
+                    icon: cpu,
+                    value: "80%",
+                  },
+                  {
+                    label: "内存",
+                    icon: mem,
+                    value: "80GB",
+                  },
+                  {
+                    label: "延时",
+                    icon: delay,
+                    value: "80ms",
+                  },
+                  {
+                    label: "温度",
+                    icon: wd,
+                    value: "40摄氏度",
+                  },
+                ].map((item) => (
+                  <div
+                    key={item.label}
+                    style={{
+                      padding: "20px",
+                      border: "#e1e1e1",
+                      display: "flex",
+                      borderRadius: "10px",
+                      alignItems: "center",
+                      color: "#ffffff",
+                      height: "50px",
+                      margin: "2px",
+                      width: "45%",
+                      background:
+                        "linear-gradient(90deg, rgba(141, 142, 142, 0.15) 0%, rgba(141, 142, 142, 0) 100%)",
+                    }}
+                  >
+                    <img
+                      src={item.icon}
+                      alt=""
+                      style={{
+                        height: "30px",
+                        width: "30px",
+                      }}
+                    />
+                    <div
+                      style={{
+                        paddingLeft: "10px",
+                        fontSize: "15px",
+                      }}
+                    >
+                      <p>{item.label}</p>
+                      <p
+                        style={{
+                          fontSize: "10px",
+                        }}
+                      >
+                        {item.value}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div
+              className="absolute"
+              style={{
+                backgroundImage: `url(${leftBg})`,
+                backgroundSize: "100% 100%",
+                right: "200px",
+                width: "400px",
+                height: "fit-content",
+                top: "30%",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  paddingLeft: "10px",
+                  alignItems: "center",
+                  backgroundImage: `url(${rightTitle})`,
+                  backgroundSize: "100% 100%",
+                  width: "100%",
+                  height: "50px",
+                }}
+              >
+                <img
+                  src={rightTitleIcon}
+                  style={{
+                    width: "30px",
+                    height: "30px",
+                  }}
+                ></img>
+                <span
+                  style={{
+                    paddingLeft: "5px",
+                    color: "#f7e4e0",
+                  }}
+                >
+                  告警信息
+                </span>
+              </div>
+              <div
+                style={{
+                  padding: "10px",
+                  display: "flex",
+                  flexWrap: "wrap",
+                }}
+              >
+                {[
+                  {
+                    label: "告警总数",
+                    icon: alertCount,
+                    value: "0件",
+                  },
+                  {
+                    label: "最近发生告警时间",
+                    icon: alertTime,
+                    value: "2025-03-27 10:21:14",
+                  },
+                ].map((item) => (
+                  <div
+                    key={item.label}
+                    style={{
+                      padding: "20px",
+                      border: "#e1e1e1",
+                      display: "flex",
+                      borderRadius: "10px",
+                      alignItems: "center",
+                      color: "#ffffff",
+                      height: "50px",
+                      margin: "2px",
+                      width: "45%",
+                      background:
+                        "linear-gradient(90deg, rgba(141, 142, 142, 0.15) 0%, rgba(141, 142, 142, 0) 100%)",
+                    }}
+                  >
+                    <img
+                      src={item.icon}
+                      alt=""
+                      style={{
+                        height: "30px",
+                        width: "30px",
+                      }}
+                    />
+                    <div
+                      style={{
+                        paddingLeft: "10px",
+                        fontSize: "15px",
+                      }}
+                    >
+                      <p
+                        style={{
+                          fontSize: "10px",
+                        }}
+                      >
+                        {item.label}
+                      </p>
+                      <p
+                        style={{
+                          fontSize: "10px",
+                        }}
+                      >
+                        {item.value}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div
+                ref={chart}
+                style={{
+                  width: "100%",
+                  height: "200px",
+                }}
+              ></div>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <></>
+      )}
 
       <div
         ref={setRef}
