@@ -4,14 +4,14 @@ import { createSingle } from "../common/createSingle";
 
 export const defaultInfo = createSingle(() => {
   return {
-    info: new Map<string, unknown>(),
+    info: new Map<string | symbol, unknown>(),
   };
 });
 
 type IPlgins = (() => Promise<{
   controller?: AbortController;
   res: unknown;
-  code: string;
+  code: string | symbol;
 }>)[];
 /**
  * 绑定id与name
@@ -31,7 +31,6 @@ export const useSetDefaultInfo = () => {
       .subscribe({
         next: (data) => {
           defaultInfo()?.info.set(data.code, data.res);
-       
         },
         error: (err) => console.error("发生错误:", err),
         complete: () => {},
