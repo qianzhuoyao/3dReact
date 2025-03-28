@@ -64,7 +64,7 @@ export const windowSingle = createSingle(() => {
   const world = new CANNON.World();
   world.gravity.set(0, -9.82, 0); // 设置重力
 
-  const cabinets = new Map<string, THREE.Group>();
+  const cabinets = new Map<string, unknown>();
 
   const cableLines = new Map<
     string,
@@ -107,6 +107,7 @@ export const windowSingle = createSingle(() => {
       texture,
       batteryMaterial,
       pivot,
+      //记录机柜名称与id的映射
       cabinets,
       //线缆
       cableLines,
@@ -114,6 +115,8 @@ export const windowSingle = createSingle(() => {
       CSS3DObjects,
       //载入的所有资源模型
       loadModels,
+      //记录告警数据
+      alertCabintList: new Set<string>(),
     },
     worker: {
       computedWorker: new Worker(

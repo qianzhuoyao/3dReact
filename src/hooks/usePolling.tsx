@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { interval, switchMap } from "rxjs";
 
 export const usePolling = (
-  plugins: (() => Promise<void>)[],
+  plugins: (() => Promise<void> | void)[],
   period?: number
 ) => {
   useEffect(() => {

@@ -378,12 +378,13 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
       group.userData.inMixObject = object;
       label.userData.tipType = "show"; // show 展示 ，select 选中 alert 警告
       object.userData.bindCssTagObject = label;
-      label.userData.mixBy = object.userData.name;
+      // label.userData.mixBy = object.userData.name;
       label.userData.mixObject = object;
+      label.userData.mixGroup = group;
       //设置默认状态
       label.userData.originMaterialImage = `url(${unSelectedTag})`;
       group.userData.objectName = object.userData.name;
-      getWindowSingle().objects.cabinets.set(object.name, group);
+      // getWindowSingle().objects.cabinets.set(object.name, group);
 
       scene.add(group);
     },

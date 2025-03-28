@@ -1,14 +1,17 @@
 import { getWindowSingle } from "../../window/windowSingle";
 
 const setModelUserDataId = (mappingData: Record<string, string>[]) => {
-  const cabinets = getWindowSingle().objects.cabinets;
+  //const cabinets = getWindowSingle().objects.cabinets;
   mappingData.forEach((data) => {
-    const cur = cabinets.get(data?.cabinetCode);
-    if (cur) {
-      cur.userData.cabinetId = data?.cabinetId;
-    }
+    getWindowSingle().objects.cabinets.set(data.cabinetCode, data);
+    // const cur = cabinets.get(data?.cabinetCode);
+    // console.log(cur,'cur')
+    // if (cur) {
+    
+    //   cur.userData.cabinetId = data?.cabinetId;
+    // }
   });
-  console.log(cabinets, "cabinets");
+  console.log(getWindowSingle().objects.loadModels, "cssObj.userData.mixObject.userData33");
 };
 
 export const ModelIdResult = Symbol("result-default-model-mapping");
@@ -29,7 +32,9 @@ export const setModelId = async () => {
       if (res.rtnCode === 200) {
         //设置模型里的机柜 ，设置上id
         setModelUserDataId(res.data);
+        return res?.data || [];
       }
+      return [];
     })
     .catch((err) => {
       if (err.name === "AbortError") {
