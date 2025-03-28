@@ -95,6 +95,7 @@ export const useInit3D = () => {
       err?: (e: unknown) => void,
       complete?: () => void
     ) => {
+      getWindowSingle().threeRender.setAnimationLoop(renderUpdate);
       of(...modelPath)
         .pipe(
           mergeMap((config) => {
@@ -106,9 +107,6 @@ export const useInit3D = () => {
                     const model = gltf.scene;
                     getWindowSingle().threeScene.add(model);
                     getWindowSingle().threeModels.set(model.uuid, model);
-                    getWindowSingle().threeRender.setAnimationLoop(
-                      renderUpdate
-                    );
                     gltf.scene.userData.tag = config.tag;
                     gltf.scene.userData.path = config.model;
                     getWindowSingle().state.loadedModelSet.add(config.model);
