@@ -8,7 +8,10 @@ const setModelUserDataId = (mappingData: Record<string, string>[]) => {
       cur.userData.cabinetId = data?.cabinetId;
     }
   });
+  console.log(cabinets, "cabinets");
 };
+
+export const ModelIdResult = Symbol("result-default-model-mapping");
 
 export const setModelId = async () => {
   const controller = new AbortController();
@@ -39,6 +42,6 @@ export const setModelId = async () => {
   return {
     controller,
     res,
-    code: "default-model-mapping",
+    code: ModelIdResult,
   };
 };
