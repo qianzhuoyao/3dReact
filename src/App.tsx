@@ -61,7 +61,7 @@ function App() {
     ]);
 
   useEffect(() => {
-    console.log(chart, "chart");
+ 
     if (chart.current) {
       const myChart = echarts.init(chart.current);
       const option = {

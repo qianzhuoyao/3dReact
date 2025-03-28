@@ -37,7 +37,7 @@ export const createLineByNames = (
         }
 
         if (targetNames.includes(obj.userData.name)) {
-          console.log(obj, "objssss");
+        
 
           targets.push({
             obj,
@@ -53,7 +53,7 @@ export const createLineByNames = (
 
       if (scene instanceof THREE.Group) {
         targets.forEach((target) => {
-          console.log(start, target.position, "csolwe");
+     
           createLine(
             scene,
             String(Math.random()),

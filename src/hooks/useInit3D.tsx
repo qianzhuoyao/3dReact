@@ -22,9 +22,11 @@ import { battery } from "../plugins/render/battery";
 import { useLoadHdr } from "./useLoadHdr";
 import { VISIBLE_WHITE } from "../common/constant";
 import { orbitControlUpdate } from "../plugins/render/orbitControlUpdate";
-import { useSetInstanceId } from "./useSetInstanceId";
+import { useSetDefaultInfo } from "./useSetDefaultInfo";
 import { usePolling } from "./usePolling";
 import { asyncAlert } from "../plugins/request/asyncAlert";
+import { setModelId } from "../plugins/request/setModelId";
+import { from, mergeMap, of, throwError } from "rxjs";
 
 export const useInit3D = () => {
   const ref = useRef({
@@ -42,7 +44,9 @@ export const useInit3D = () => {
   useDefaultEvent();
 
   usePolling([asyncAlert]);
-  useSetInstanceId();
+  const { setInitSetDefaultInfoPlugins, run } = useSetDefaultInfo();
+
+  setInitSetDefaultInfoPlugins([setModelId]);
 
   const { initDom } = useInsertDom();
   const animate = useAnimate();
@@ -88,41 +92,62 @@ export const useInit3D = () => {
       modelPath: { model: string; tag: string }[],
       callback?: (gltf: GLTF) => void,
       onProgress?: (event: ProgressEvent) => void,
-      err?: (e: unknown) => void
+      err?: (e: unknown) => void,
+      complete?: () => void
     ) => {
-      modelPath.forEach((path) => {
-        if (getWindowSingle().state.loadedModelSet.has(path.model)) {
-          return;
-        }
-        loader.load(
-          path.model,
-          function (gltf) {
-            const model = gltf.scene;
-            getWindowSingle().threeScene.add(model);
-            getWindowSingle().threeModels.set(model.uuid, model);
-            getWindowSingle().threeRender.setAnimationLoop(renderUpdate);
-            gltf.scene.userData.tag = path.tag;
-            gltf.scene.userData.path = path.model;
-            getWindowSingle().state.loadedModelSet.add(path.model);
-            console.log(model, "model");
+      of(...modelPath)
+        .pipe(
+          mergeMap((config) => {
+            return from(
+              new Promise<void>((resolve) => {
+                loader.load(
+                  config.model,
+                  function (gltf) {
+                    const model = gltf.scene;
+                    getWindowSingle().threeScene.add(model);
+                    getWindowSingle().threeModels.set(model.uuid, model);
+                    getWindowSingle().threeRender.setAnimationLoop(
+                      renderUpdate
+                    );
+                    gltf.scene.userData.tag = config.tag;
+                    gltf.scene.userData.path = config.model;
+                    getWindowSingle().state.loadedModelSet.add(config.model);
+                    getWindowSingle().objects.loadModels.set(
+                      config.tag,
+                      gltf.scene
+                    );
 
-            callback?.(gltf);
+                    callback?.(gltf);
+                    resolve();
+                  },
+                  onProgress,
+                  function (e) {
+                    console.error(e);
+                    throwError(() => e);
+                  }
+                );
+              })
+            );
+          })
+        )
+        .subscribe({
+          next: () => {},
+          error: (e) => {
+            err?.(e);
+          },
+          complete: () => {
+            run();
+            complete?.();
+            ref.current.loadCount++;
             if (ref.current.loadCount > 1) {
               console.warn(
                 "模型加载次数过多,加载" + ref.current.loadCount + "次"
               );
             }
           },
-          onProgress,
-          function (e) {
-            err?.(e);
-            console.error(e);
-          }
-        );
-      });
-      ref.current.loadCount++;
+        });
     },
-    [loader, renderUpdate]
+    [loader, renderUpdate, run]
   );
 
   const setRef: RefCallback<HTMLDivElement> = useCallback(
@@ -148,10 +173,10 @@ export const useInit3D = () => {
         return;
       }
 
-      console.log(child.userData, "child.userData");
       if (
         getWindowSingle().state.currentLoadImportModels.has(child.userData.tag)
       ) {
+        // child.layers.set(0);
         child.visible = true;
 
         if (Array.isArray(child.userData.originScale)) {
@@ -163,9 +188,9 @@ export const useInit3D = () => {
           );
         }
       } else {
-        child.userData.originScale = [...child.scale.toArray()];
+        // child.userData.originScale = [...child.scale.toArray()];
         child.visible = false;
-
+        //   child.layers.set(1);
         child.scale.set(0, 0, 0);
       }
     });

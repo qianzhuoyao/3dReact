@@ -8,7 +8,11 @@ import {
   Object3DEventMap,
 } from "three";
 import { getWindowSingle } from "../../window/windowSingle";
-import { lineMap, PAUSE_INTERSECTION, selectedTag } from "../../common/constant";
+import {
+  lineMap,
+  PAUSE_INTERSECTION,
+  selectedTag,
+} from "../../common/constant";
 import { createSingle } from "../../common/createSingle";
 import { findModelByCondition } from "../../common/findModelByCondition";
 import { changeObject } from "../../common/changeModelByObject";
@@ -143,8 +147,6 @@ export const checkIntersection = () => {
         // }, object);
 
         if (object.userData?.meshType === "line") {
-          console.log(object, "cmeshTypes");
-
           if (object.isMesh) {
             const targetLineObjectMaterial = Array.isArray(object.material)
               ? object.material[0]
@@ -158,7 +160,7 @@ export const checkIntersection = () => {
             }
 
             const cloneLineObjectMaterial = targetLineObjectMaterial.clone();
-            console.log(object.material, "object.material");
+
             if (Array.isArray(object.material)) {
               object.userData.originalMaterial = object.material[0];
               object.material[0] = cloneLineObjectMaterial;
@@ -176,11 +178,7 @@ export const checkIntersection = () => {
                 const aboutLine = LineRelationMap()?.relation.get(
                   mapRelation.start.floor + mapRelation.start.name
                 );
-                console.log(
-                  aboutLine,
-                  LineRelationMap()?.relation,
-                  "aboutLinesss"
-                );
+
                 if (aboutLine instanceof Mesh) {
                   aboutLine.userData.originalMaterial = object.material;
 
@@ -195,7 +193,6 @@ export const checkIntersection = () => {
             }
           }
         }
-        console.log(object, "lineGroup");
       }
     }
   } catch (e) {

@@ -31,7 +31,7 @@ export const setColor = (
       t.material = cloneMaterial2;
       cloneMaterial2.emissive.set(color);
       t.userData.clonedCableOriginMaterial = cloneMaterial2;
-      console.log(cloneMaterial, cloneMaterial2, "cloneMaterial");
+     
     }
   });
 };

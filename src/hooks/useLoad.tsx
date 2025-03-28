@@ -139,19 +139,14 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
             const cloneLineDevice = Object3DRef.current.lineDevice?.clone();
 
             const lineDeviceGroup = new THREE.Group();
-            console.log(
-              cloneLineDevice,
-              deviceList,
-              Object3DRef.current.lineDevice,
-              "deviceList"
-            );
+
             const lineMeshMapList: THREE.Object3D[] = [];
             if (cloneLineDevice) {
               cloneLineDevice.userData.belong = "line-device";
               cloneLineDevice.visible = true;
               cloneLineDevice.scale.set(1, 0.7, 1);
               cloneLineDevice.name = device.name;
-              console.log(cloneLineDevice, device.lines, "cloneLineDevices");
+
               cloneLineDevice.children.some((child) => {
                 if (child.userData.name === "线缆") {
                   child.children.some((item) => {
@@ -259,35 +254,8 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
     }
   }, []);
 
-  const reset = useCallback(() => {
-    if (Object3DRef.current.door) {
-      const gp = getWindowSingle().objects.pivot.get(Object3DRef.current.door);
-      closeDoor(gp);
-    }
-
-    Object3DRef.current.allCloneDeviceList.forEach((deviceClone) => {
-      gsap.to(deviceClone.position, {
-        x: 0.65,
-        y: -0.34,
-        z: -0.55,
-        duration: 0.5,
-        ease: "power2.out",
-      });
-    });
-
-    gsap.to(getWindowSingle().threeCamera.position, {
-      x: Object3DRef.current.originCamera?.position.toArray()[0],
-      y: Object3DRef.current.originCamera?.position.toArray()[1],
-      z: Object3DRef.current.originCamera?.position.toArray()[2],
-      duration: 1,
-      ease: "power2.out",
-    });
-  }, [closeDoor]);
-
   const showCable = useCallback((show: boolean) => {
     getWindowSingle().objects.cableLines.forEach((cable) => {
-      console.log(cable, "cablessss");
-
       if (cable.start.obj?.userData.bindCssTagObject) {
         if (show) {
           cable.start.obj.userData.bindCssTagObject.element.firstElementChild.style.backgroundImage = `url(${selectedTag})`;
@@ -320,7 +288,6 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
         changeObject(cable.target.obj, (t) => {
           const material = t.material;
           if (material instanceof THREE.MeshStandardMaterial) {
-            console.log(t, show, "csacascasc");
             if (show) {
               t.material = t.userData.clonedCableOriginMaterial;
             } else {
@@ -333,13 +300,57 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
   }, []);
 
   const back = useCallback(() => {
-    reset();
     if (ref.current.currentModel === "cabinetAndDeviceModel") {
-      setCurrentModel(["modelA"]);
-      ref.current.currentModel = "modelA";
-      setCurrentModelState(["modelA"]);
+      if (Object3DRef.current.door) {
+        const gp = getWindowSingle().objects.pivot.get(
+          Object3DRef.current.door
+        );
+        closeDoor(gp);
+      }
+
+      Object3DRef.current.allCloneDeviceList.forEach((deviceClone) => {
+        gsap.to(deviceClone.position, {
+          x: 0.65,
+          y: -0.34,
+          z: -0.55,
+          duration: 0.5,
+          ease: "power2.out",
+        });
+      });
+
+      const direction = new THREE.Vector3();
+      getWindowSingle().threeCamera.getWorldDirection(direction);
+      getWindowSingle().threeOrbitControls.target.set(0, 0, 0);
+      gsap.to(getWindowSingle().threeCamera.position, {
+        x: getWindowSingle().threeCamera.position.x - direction.x * 0.6,
+        y: getWindowSingle().threeCamera.position.y - direction.y * 0.6,
+        z: getWindowSingle().threeCamera.position.z - direction.z * 0.6,
+        duration: 0.7,
+        ease: "power2.out",
+        onComplete: () => {
+          setCurrentModel(["modelA"]);
+          ref.current.currentModel = "modelA";
+          setCurrentModelState(["modelA"]);
+          gsap.to(getWindowSingle().threeCamera.position, {
+            x: Object3DRef.current.originCamera?.position.toArray()[0],
+            y: Object3DRef.current.originCamera?.position.toArray()[1],
+            z: Object3DRef.current.originCamera?.position.toArray()[2],
+            duration: 0.7,
+            ease: "power2.out",
+          });
+        },
+      });
+
+      // gsap.to(getWindowSingle().threeCamera.position, {
+      //   x: 0.35417975254882605,
+      //   y: 0.9307114999619761,
+      //   z: 1.042830504709191,
+      //   duration: 1,
+      //   ease: "power2.out",
+      //   onComplete: () => {},
+      // });
     }
-  }, [reset, setCurrentModel]);
+  }, [closeDoor, setCurrentModel]);
 
   const createTag = useCallback(() => {
     const labelDiv = document.createElement("div");
@@ -372,6 +383,8 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
       //设置默认状态
       label.userData.originMaterialImage = `url(${unSelectedTag})`;
       group.userData.objectName = object.userData.name;
+      getWindowSingle().objects.cabinets.set(object.name, group);
+
       scene.add(group);
     },
     [createTag]
@@ -419,11 +432,6 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
 
       if (deviceItem && ref.current.openDoor) {
         Object3DRef.current.allCloneDeviceList.forEach((deviceClone) => {
-          console.log(
-            deviceClone.userData.tag,
-            deviceItem.userData.tag,
-            "cascascawe"
-          );
           if (deviceClone.userData.tag !== deviceItem.userData.tag) {
             Object3DRef.current.showLines.get(deviceClone)?.forEach((l) => {
               l.visible = true;
@@ -469,7 +477,6 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
         });
       }
 
-      console.log(selectedObject, "selectedObject");
       const doorGroup = findModelByCondition((userData) => {
         if (typeof userData?.name === "string") {
           return userData?.name.indexOf("门") > -1;
@@ -485,7 +492,6 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
           return;
         }
 
-        console.log(doorGroup, "sceness");
         if (gp) {
           if (ref.current.openDoor) {
             gsap.to(gp.rotation, { y: 0, duration: 1 });
@@ -516,7 +522,7 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
           y: getWindowSingle().threeCamera.position.y + direction.y * 0.88,
           z: getWindowSingle().threeCamera.position.z + direction.z * 0.88,
           duration: 0.7,
-          ease: "power2.out",
+          ease: "power1.out",
 
           onComplete: () => {
             if (ref.current.currentModel === "modelA") {
@@ -533,13 +539,8 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
                 y: Object3DRef.current.originCamera?.position.toArray()[1],
                 z: Object3DRef.current.originCamera?.position.toArray()[2],
                 duration: 0.7,
-                ease: "power2.out",
+                ease: "power1.out",
                 onComplete: () => {
-                  console.log(
-                    Object3DRef.current.originCamera?.position.toArray(),
-                    "Object3DRef.current.originCamera"
-                  );
-
                   if (Object3DRef.current.originCamera) {
                     // getWindowSingle().threeCamera.copy(
                     //   Object3DRef.current.originCamera
@@ -618,33 +619,41 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
       //设置下视线，避免一开始就选中
       //setCameraLookAt(0, -0.2, 0);
 
-      load(models, (gltf) => {
-        console.log(gltf, "gltf");
-        gltf.scene.position.set(0, 0, 0);
-        gltf.scene.scale.set(0.1, 0.1, 0.1);
-        gltf.scene.userData.originScale = [0.1, 0.1, 0.1];
-
-        setCenter(gltf.scene);
-        mixTagWithJG(gltf.scene);
-        setCurrentModelState(["modelA"]);
-        // gltf.scene.layers.set(1);
-        createLineByNames("JF02_JG01", ["JF02_JG10"], [0.1, 1, 0]);
-
-        Object3DRef.current.originCamera =
-          getWindowSingle().threeCamera.clone(true);
-
-        if (gltf.scene.userData.tag === "cabinetAndDeviceModel") {
-          initCab(gltf.scene);
-          setCabinetAndDeviceModelAttr(gltf.scene);
-        } else if (gltf.scene.userData.tag === "lineDevice") {
+      load(
+        models,
+        (gltf) => {
           gltf.scene.position.set(0, 0, 0);
-          gltf.scene.scale.set(1, 1, 1);
-          gltf.scene.userData.originScale = [1, 1, 1];
-          Object3DRef.current.lineDevice = gltf.scene;
+          gltf.scene.scale.set(0.1, 0.1, 0.1);
+          gltf.scene.userData.originScale = [0.1, 0.1, 0.1];
+          setCenter(gltf.scene);
+          // gltf.scene.layers.set(1);
+
+          if (gltf.scene.userData.tag === "cabinetAndDeviceModel") {
+            initCab(gltf.scene);
+            setCabinetAndDeviceModelAttr(gltf.scene);
+            gltf.scene.visible = false;
+          } else if (gltf.scene.userData.tag === "lineDevice") {
+            gltf.scene.position.set(0, 0, 0);
+            gltf.scene.scale.set(1, 1, 1);
+            gltf.scene.userData.originScale = [1, 1, 1];
+            gltf.scene.visible = false;
+            Object3DRef.current.lineDevice = gltf.scene;
+          } else if (gltf.scene.userData.tag === "modelA") {
+            mixTagWithJG(gltf.scene);
+            Object3DRef.current.originCamera =
+              getWindowSingle().threeCamera.clone();
+          }
+
+          //添加标签
+        },
+        void 0,
+        void 0,
+        () => {
+          setCurrentModel(["modelA"]);
+          setCurrentModelState(["modelA"]);
+          createLineByNames("JF02_JG01", ["JF02_JG10"], [0.1, 1, 0]);
         }
-        setCurrentModel(["modelA"]);
-        //添加标签
-      });
+      );
       ref.current.isLoaded = true;
     }
   }, [

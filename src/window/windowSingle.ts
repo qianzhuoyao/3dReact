@@ -64,6 +64,8 @@ export const windowSingle = createSingle(() => {
   const world = new CANNON.World();
   world.gravity.set(0, -9.82, 0); // 设置重力
 
+  const cabinets = new Map<string, THREE.Group>();
+
   const cableLines = new Map<
     string,
     {
@@ -81,6 +83,8 @@ export const windowSingle = createSingle(() => {
   >();
 
   const pivot = new WeakMap();
+
+  const loadModels = new Map<string, THREE.Object3D>();
 
   return {
     world,
@@ -103,10 +107,13 @@ export const windowSingle = createSingle(() => {
       texture,
       batteryMaterial,
       pivot,
+      cabinets,
       //线缆
       cableLines,
       //css3对象
       CSS3DObjects,
+      //载入的所有资源模型
+      loadModels,
     },
     worker: {
       computedWorker: new Worker(

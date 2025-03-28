@@ -12,7 +12,7 @@ export const useWorker = () => {
   const findMeshGroupsInWorker = useCallback(() => {
     return new Promise((resolve, reject) => {
       getWindowSingle().worker.computedWorker.onmessage = function (event) {
-        console.log(event, "event");
+     
         const res = workerComputedResult();
         if (res) {
           res.intersectionCurrentParentGroup = event.data;

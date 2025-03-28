@@ -3,7 +3,8 @@ import { interval, switchMap } from "rxjs";
 
 export const usePolling = (
   plugins: (() => Promise<void>)[],
-  period?: number
+  period?: number,
+
 ) => {
   useEffect(() => {
     const polling$ = interval(period || 5000)
@@ -19,5 +20,5 @@ export const usePolling = (
     return () => {
       polling$.unsubscribe();
     };
-  }, [plugins]);
+  }, [period, plugins]);
 };
