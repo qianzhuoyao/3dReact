@@ -10,6 +10,22 @@ import {
   RGBELoader,
 } from "three/examples/jsm/Addons.js";
 import * as CANNON from "cannon-es";
+import { Subject } from "rxjs";
+
+export interface IDevice {
+  cabinetId: string;
+  high: number;
+  id: string;
+  ip: string;
+  maker: string;
+  model: string;
+  name: string;
+  position: number;
+  relationCabinetName: string;
+  serialNum: string;
+  state: number;
+  type: string;
+}
 
 export const windowSingle = createSingle(() => {
   const threeCamera = new THREE.PerspectiveCamera();
@@ -66,6 +82,13 @@ export const windowSingle = createSingle(() => {
 
   const cabinets = new Map<string, unknown>();
 
+  const cabinetDevices = new Map<string, IDevice[]>();
+
+  const singalUpdate = new Subject<{
+    messageCode: string;
+    payload: unknown;
+  }>();
+
   const cableLines = new Map<
     string,
     {
@@ -103,12 +126,17 @@ export const windowSingle = createSingle(() => {
     threeClock,
     threeOrbitControls,
     threeDom,
+    singals: {
+      singalUpdate,
+    },
     objects: {
       texture,
       batteryMaterial,
       pivot,
       //记录机柜名称与id的映射
       cabinets,
+      //记录机柜与所属设备的信息
+      cabinetDevices,
       //线缆
       cableLines,
       //css3对象

@@ -2,7 +2,7 @@ import { useCallback } from "react";
 import { mergeMap, timer, merge, of } from "rxjs";
 
 export const usePolling = (
-  plugins: (() => Promise<void> | void)[],
+  plugins: (() => Promise<unknown> | void)[],
   period?: number
 ) => {
   const runPolling = useCallback(
@@ -10,7 +10,6 @@ export const usePolling = (
       return timer(0, period || 5000)
         .pipe(
           mergeMap(() => {
-            console.log("aaaaa");
             const observables = plugins.map((fn) => of(fn()));
             return merge(...observables);
           })

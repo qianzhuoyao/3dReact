@@ -28,6 +28,8 @@ import { asyncAlert } from "../plugins/request/asyncAlert";
 import { setModelId } from "../plugins/request/setModelId";
 import { from, mergeMap, of, throwError } from "rxjs";
 import { createCabinet } from "../plugins/request/createCabinet";
+import { getLinks } from "../plugins/request/getLink";
+import { syncCabinetName } from "../plugins/request/syncCabinetName";
 
 export const useInit3D = () => {
   const ref = useRef({
@@ -44,7 +46,12 @@ export const useInit3D = () => {
   useLoadHdr();
   useDefaultEvent();
 
-  const { runPolling } = usePolling([asyncAlert, createCabinet]);
+  const { runPolling } = usePolling([
+    asyncAlert,
+    createCabinet,
+    getLinks,
+    syncCabinetName,
+  ]);
   const { setInitSetDefaultInfoPlugins, run } = useSetDefaultInfo();
 
   setInitSetDefaultInfoPlugins([setModelId]);

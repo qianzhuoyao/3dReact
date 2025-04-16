@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useInit3D } from "./useInit3D";
 import * as THREE from "three";
 import { CSS3DObject } from "three/examples/jsm/Addons.js";
-import { getWindowSingle } from "../window/windowSingle";
+import { getWindowSingle, IDevice } from "../window/windowSingle";
 import { findModelByCondition } from "../common/findModelByCondition";
 import gsap from "gsap";
 import { createLineByNames } from "../common/createLineByNames";
@@ -48,11 +48,12 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
     device: null | THREE.Object3D;
     cabinet: null | THREE.Group;
     allCloneDeviceList: THREE.Object3D[];
-
+    allCloneDeviceLinesList: THREE.Object3D[];
     originCamera: THREE.PerspectiveCamera | null;
     lineDevice: THREE.Group | null;
     showLines: WeakMap<THREE.Object3D, THREE.Object3D[]>;
   }>({
+    allCloneDeviceLinesList: [],
     showLines: new WeakMap(),
     allCloneDeviceList: [],
     door: null,
@@ -112,25 +113,26 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
     ref.current.openDoor = false;
   }, []);
   const addDevice = useCallback(
-    (
-      deviceList: {
-        name: string;
-        content: string[];
-        floor: number;
-        lines: string[];
-      }[]
-    ) => {
+    (deviceList: (IDevice & { lines: string[] })[]) => {
       if (
         getWindowSingle().state.currentLoadImportModels.has(
           "cabinetAndDeviceModel"
         )
       ) {
         if (Object3DRef.current.cabinet) {
+          //移除之前的设备
+          Object3DRef.current.allCloneDeviceLinesList.forEach((device) => {
+            if (device.parent) {
+              device.parent.remove(device);
+            }
+          });
+          Object3DRef.current.allCloneDeviceLinesList = [];
+
           deviceList.forEach((device) => {
             if (
               Object3DRef.current.allCloneDeviceList.some(
                 (deviceItem) =>
-                  deviceItem.userData.tag === getSubDeviceTag(device.floor)
+                  deviceItem.userData.tag === getSubDeviceTag(device.position)
               )
             ) {
               return;
@@ -152,7 +154,7 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
                   child.children.some((item) => {
                     if (item.userData.name === "线") {
                       item.children.forEach((lineMesh) => {
-                        lineMesh.userData.floor = device.floor;
+                        lineMesh.userData.floor = device.position - 1;
                         // lineMesh.userData.aboutPortLines=lineMap.filter(line=>{
 
                         // })
@@ -164,7 +166,7 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
                           // lineMesh.userData.lineCode
                           lineMeshMapList.push(lineMesh);
                           LineRelationMap()?.relation.set(
-                            device.floor + lineMesh.userData.name,
+                            device.position - 1 + lineMesh.userData.name,
                             lineMesh
                           );
                         } else {
@@ -184,21 +186,23 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
             if (cloneDevice) {
               cloneDevice.userData.belong = "device";
               cloneDevice.visible = true;
-              cloneDevice.userData.tag = getSubDeviceTag(device.floor);
+              cloneDevice.userData.tag = getSubDeviceTag(device.position - 1);
               cloneDevice.position.set(0.65, -0.34, -0.55);
+              cloneDevice.userData.deviceInfo = device;
               cloneDevice.name = device.name;
               Object3DRef.current.allCloneDeviceList.push(cloneDevice);
               cloneLineDevice?.add(cloneDevice);
 
               Object3DRef.current.showLines.set(cloneDevice, lineMeshMapList);
             }
-            lineDeviceGroup.userData.tag = device.floor;
+            lineDeviceGroup.userData.tag = device.position - 1;
             lineDeviceGroup.scale.set(1, 0.8, 1);
             lineDeviceGroup.position.set(
               -0.63,
-              deviceLevel[device.floor],
+              deviceLevel[device.position - 1],
               0.89
             );
+            Object3DRef.current.allCloneDeviceLinesList.push(lineDeviceGroup);
             Object3DRef.current.cabinet?.add(lineDeviceGroup);
           });
         }
@@ -457,6 +461,10 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
                 ease: "power2.out",
                 onComplete: () => {
                   ref.current.expandDevice = "";
+                  getWindowSingle().singals.singalUpdate.next({
+                    messageCode: "deviceCheck",
+                    payload: void 0,
+                  });
                 },
               });
             } else {
@@ -471,6 +479,10 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
                 ease: "power2.out",
                 onComplete: () => {
                   ref.current.expandDevice = deviceClone.userData.tag;
+                  getWindowSingle().singals.singalUpdate.next({
+                    messageCode: "deviceCheck",
+                    payload: deviceClone.userData?.deviceInfo,
+                  });
                 },
               });
             }
@@ -564,28 +576,42 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
                       const gp = getWindowSingle().objects.pivot.get(
                         Object3DRef.current.door
                       );
+                      console.log(parentGroup, "parentGroupaaa");
+                      const currentCabinetDevices =
+                        getWindowSingle().objects.cabinetDevices.get(
+                          parentGroup.name
+                        );
+
+                      if (currentCabinetDevices) {
+                        addDevice(
+                          currentCabinetDevices.map((item) => ({
+                            ...item,
+                            lines: ["1", "48"],
+                          }))
+                        );
+                      }
                       //显示当前机柜下的设备
-                      addDevice([
-                        {
-                          name: "1",
-                          floor: 1,
-                          //暂无效
-                          content: ["top", "bottom", "center"],
-                          lines: ["1", "48"],
-                        },
-                        {
-                          floor: 0,
-                          name: "2",
-                          lines: [],
-                          content: ["top", "bottom", "center"],
-                        },
-                        {
-                          floor: 2,
-                          lines: ["1", "2", "3", "4", "5", "6", "34"],
-                          name: "3",
-                          content: ["bottom"],
-                        },
-                      ]);
+                      // addDevice([
+                      //   {
+                      //     name: "1",
+                      //     floor: 1,
+                      //     //暂无效
+                      //     content: ["top", "bottom", "center"],
+                      //     lines: ["1", "48"],
+                      //   },
+                      //   {
+                      //     floor: 0,
+                      //     name: "2",
+                      //     lines: [],
+                      //     content: ["top", "bottom", "center"],
+                      //   },
+                      //   {
+                      //     floor: 2,
+                      //     lines: ["1", "2", "3", "4", "5", "6", "34"],
+                      //     name: "3",
+                      //     content: ["bottom"],
+                      //   },
+                      // ]);
                       openDoor(gp);
                     }
                   }
