@@ -25,7 +25,10 @@ function App() {
   const [state, setState] = useState<"deviceCheck" | "none">("none");
   const [deviceInfo, setDeviceInfo] = useState<IDevice | void>(void 0);
 
-  const [alertInfo, setAlertInfo] = useState<unknown[]>([]);
+  const [alertInfo, setAlertInfo] = useState<{
+    records: Record<string, unknown>[];
+    total: string;
+  } | void>(void 0);
 
   const { width, height } = useWindowSize();
 
@@ -99,31 +102,36 @@ function App() {
                           data: [
                             {
                               value: jsonData.data?.find(
-                                (item) => item?.levelName === "信息"
+                                (item: Record<string, unknown>) =>
+                                  item?.levelName === "信息"
                               )?.alertCount,
                               name: "信息",
                             },
                             {
                               value: jsonData.data?.find(
-                                (item) => item?.levelName === "告警"
+                                (item: Record<string, unknown>) =>
+                                  item?.levelName === "告警"
                               )?.alertCount,
                               name: "告警",
                             },
                             {
                               value: jsonData.data?.find(
-                                (item) => item?.levelName === "一般"
+                                (item: Record<string, unknown>) =>
+                                  item?.levelName === "一般"
                               )?.alertCount,
                               name: "一般",
                             },
                             {
                               value: jsonData.data?.find(
-                                (item) => item?.levelName === "严重"
+                                (item: Record<string, unknown>) =>
+                                  item?.levelName === "严重"
                               )?.alertCount,
                               name: "严重",
                             },
                             {
                               value: jsonData.data?.find(
-                                (item) => item?.levelName === "紧急"
+                                (item: Record<string, unknown>) =>
+                                  item?.levelName === "紧急"
                               )?.alertCount,
                               name: "紧急",
                             },
@@ -684,7 +692,7 @@ function App() {
                             fontSize: "10px",
                           }}
                         >
-                          {item.value}
+                          {item.value as string}
                         </p>
                       </div>
                     </div>
