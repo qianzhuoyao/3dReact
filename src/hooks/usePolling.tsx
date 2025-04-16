@@ -1,23 +1,26 @@
-import { useEffect } from "react";
-import { interval, switchMap } from "rxjs";
+import { useCallback } from "react";
+import { mergeMap, timer, merge, of } from "rxjs";
 
 export const usePolling = (
   plugins: (() => Promise<void> | void)[],
   period?: number
 ) => {
-  useEffect(() => {
-    const polling$ = interval(period || 5000)
-      .pipe(
-        switchMap(() => {
-          return plugins.map((task) => {
-            return task();
-          });
-        })
-      )
-      .subscribe();
+  const runPolling = useCallback(
+    (subscribe?: () => void) => {
+      return timer(0, period || 5000)
+        .pipe(
+          mergeMap(() => {
+            console.log("aaaaa");
+            const observables = plugins.map((fn) => of(fn()));
+            return merge(...observables);
+          })
+        )
+        .subscribe(subscribe);
+    },
+    [period, plugins]
+  );
 
-    return () => {
-      polling$.unsubscribe();
-    };
-  }, [period, plugins]);
+  return {
+    runPolling,
+  };
 };

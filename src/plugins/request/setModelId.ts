@@ -1,17 +1,9 @@
 import { getWindowSingle } from "../../window/windowSingle";
 
 const setModelUserDataId = (mappingData: Record<string, string>[]) => {
-  //const cabinets = getWindowSingle().objects.cabinets;
   mappingData.forEach((data) => {
     getWindowSingle().objects.cabinets.set(data.cabinetCode, data);
-    // const cur = cabinets.get(data?.cabinetCode);
-    // console.log(cur,'cur')
-    // if (cur) {
-    
-    //   cur.userData.cabinetId = data?.cabinetId;
-    // }
   });
-  console.log(getWindowSingle().objects.loadModels, "cssObj.userData.mixObject.userData33");
 };
 
 export const ModelIdResult = Symbol("result-default-model-mapping");

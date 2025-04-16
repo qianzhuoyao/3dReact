@@ -25,7 +25,7 @@ export const useSetDefaultInfo = () => {
     execution: false,
   });
 
-  const run = useCallback(() => {
+  const run = useCallback((complete?: () => void) => {
     return of(...ref.current.plugins)
       .pipe(mergeMap((fn) => from(fn())))
       .subscribe({
@@ -33,7 +33,7 @@ export const useSetDefaultInfo = () => {
           defaultInfo()?.info.set(data.code, data.res);
         },
         error: (err) => console.error("发生错误:", err),
-        complete: () => {},
+        complete,
       });
   }, []);
 

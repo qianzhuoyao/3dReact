@@ -27,6 +27,7 @@ import { usePolling } from "./usePolling";
 import { asyncAlert } from "../plugins/request/asyncAlert";
 import { setModelId } from "../plugins/request/setModelId";
 import { from, mergeMap, of, throwError } from "rxjs";
+import { createCabinet } from "../plugins/request/createCabinet";
 
 export const useInit3D = () => {
   const ref = useRef({
@@ -43,7 +44,7 @@ export const useInit3D = () => {
   useLoadHdr();
   useDefaultEvent();
 
-  usePolling([asyncAlert]);
+  const { runPolling } = usePolling([asyncAlert, createCabinet]);
   const { setInitSetDefaultInfoPlugins, run } = useSetDefaultInfo();
 
   setInitSetDefaultInfoPlugins([setModelId]);
@@ -134,8 +135,11 @@ export const useInit3D = () => {
             err?.(e);
           },
           complete: () => {
-            run();
+            run(() => {
+              runPolling();
+            });
             complete?.();
+
             ref.current.loadCount++;
             if (ref.current.loadCount > 1) {
               console.warn(
@@ -145,7 +149,7 @@ export const useInit3D = () => {
           },
         });
     },
-    [loader, renderUpdate, run]
+    [loader, renderUpdate, run, runPolling]
   );
 
   const setRef: RefCallback<HTMLDivElement> = useCallback(

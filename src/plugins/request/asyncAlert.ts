@@ -10,7 +10,7 @@ const warn = new URL("../../assets/warning_00042.png", import.meta.url).href;
 export const asyncAlert = () => {
   const modelData = defaultInfo()?.info.get(ModelIdResult);
 
-  console.log(modelData, "modelData");
+ // console.log(modelData,'modelData')
 
   if (Array.isArray(modelData)) {
     return fetch("/mwapi/alert/thirdAlert/thirdCurrent", {
