@@ -7,7 +7,11 @@ export const setModelUserDataId = (mappingData: Record<string, string>[]) => {
   });
   getWindowSingle().objects.CSS3DObjects.forEach((cssObj) => {
     cssObj.userData.mappingInfo = mappingData.find(
-      (i) => i.cabinetCode === cssObj.userData.mixObject.userData.name
+      (i) =>
+        i.cabinetCode ===
+        (getWindowSingle().mapping.indexMap01 as Record<string, string>)?.[
+          cssObj.userData.mixObject.userData.name
+        ]
     );
     cssObj.element.innerHTML = ` <div class="tag-content" style="
          background-image: url(${unSelectedTag});

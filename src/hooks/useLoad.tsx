@@ -363,12 +363,22 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
 
   const mix = useCallback(
     (object: THREE.Object3D, scene: THREE.Object3D) => {
+      // object.userData.originName = object.name;
+      // object.name = indexMap01[object.name] || object.name;
+      // object.userData.tag = object.name;
+      // object.userData.name = object.name;
+
+      console.log(object.userData.name, object.userData.originName, "child");
       const group = new THREE.Group();
       const tag = createTag();
-      tag.innerHTML = ` <div class="tag-content" style="
+      tag.innerHTML = `<div class="tag-content" style="
      background-image: url(${unSelectedTag});
       "> 
-      <div class="tag-text">${object.userData.name}</div>
+      <div class="tag-text">${
+        (getWindowSingle().mapping.indexMap01 as Record<string, string>)?.[
+          object.name
+        ]
+      }</div>
       </div>`;
       const label = new CSS3DObject(tag);
       getWindowSingle().objects.CSS3DObjects.add(label);
@@ -398,6 +408,8 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
   //查找机柜，并创建tag
   const mixTagWithJG = useCallback(
     (obj: THREE.Object3D) => {
+      console.log(obj, "okoss");
+
       [...obj.children].forEach((child) => {
         if (
           child.isObject3D &&
