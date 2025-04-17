@@ -12,6 +12,12 @@ import { getWindowSingle, IDevice } from "../../window/windowSingle";
  * 如果请求失败，则抛出错误。
  */
 export const createCabinet = async () => {
+
+
+  if (!getWindowSingle().state.currentLoadImportModels.has("modelA")) {
+    return void 0;
+  }
+
   const controller = new AbortController();
   const signal = controller.signal;
 

@@ -12,7 +12,7 @@ type IPlgins = (() => Promise<{
   controller?: AbortController;
   res: unknown;
   code: string | symbol;
-}>)[];
+} | void>)[];
 /**
  * 绑定id与name
  */
@@ -30,7 +30,9 @@ export const useSetDefaultInfo = () => {
       .pipe(mergeMap((fn) => from(fn())))
       .subscribe({
         next: (data) => {
-          defaultInfo()?.info.set(data.code, data.res);
+          if (data) {
+            defaultInfo()?.info.set(data.code, data.res);
+          }
         },
         error: (err) => console.error("发生错误:", err),
         complete,

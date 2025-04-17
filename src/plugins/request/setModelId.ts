@@ -8,13 +8,11 @@ export const setModelUserDataId = (mappingData: Record<string, string>[]) => {
   getWindowSingle().objects.CSS3DObjects.forEach((cssObj) => {
     cssObj.userData.mappingInfo = mappingData.find(
       (i) => i.cabinetCode === cssObj.userData.mixObject.userData.name
-    )
+    );
     cssObj.element.innerHTML = ` <div class="tag-content" style="
          background-image: url(${unSelectedTag});
           "> 
-          <div class="tag-text">${
-            cssObj.userData.mappingInfo?.cabinetName
-          }</div>
+          <div class="tag-text">${cssObj.userData.mappingInfo?.cabinetName}</div>
           </div>`;
   });
 };
@@ -22,6 +20,10 @@ export const setModelUserDataId = (mappingData: Record<string, string>[]) => {
 export const ModelIdResult = Symbol("result-default-model-mapping");
 
 export const setModelId = async () => {
+  if (!getWindowSingle().state.currentLoadImportModels.has("modelA")) {
+    return void 0;
+  }
+
   const controller = new AbortController();
   const signal = controller.signal;
 

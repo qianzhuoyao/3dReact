@@ -8,6 +8,12 @@ import { ModelIdResult } from "./setModelId";
 const warn = new URL("../../assets/warning_00042.png", import.meta.url).href;
 
 export const asyncAlert = () => {
+
+
+  if (!getWindowSingle().state.currentLoadImportModels.has("modelA")) {
+    return void 0;
+  }
+
   const modelData = defaultInfo()?.info.get(ModelIdResult);
 
   console.log(modelData, "modelData");

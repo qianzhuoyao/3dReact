@@ -46,12 +46,13 @@ export const useInit3D = () => {
   useLoadHdr();
   useDefaultEvent();
 
-  const { runPolling } = usePolling([
-    asyncAlert,
-    createCabinet,
-    getLinks,
-    syncCabinetName,
-  ]);
+  const { runPolling } = usePolling([asyncAlert, createCabinet, getLinks]);
+
+  const { runPolling: runPollingEveryDay } = usePolling(
+    [syncCabinetName],
+    24 * 60 * 60 * 1000
+  );
+
   const { setInitSetDefaultInfoPlugins, run } = useSetDefaultInfo();
 
   setInitSetDefaultInfoPlugins([setModelId]);
@@ -144,6 +145,7 @@ export const useInit3D = () => {
           complete: () => {
             run(() => {
               runPolling();
+              runPollingEveryDay();
             });
             complete?.();
 
@@ -156,7 +158,7 @@ export const useInit3D = () => {
           },
         });
     },
-    [loader, renderUpdate, run, runPolling]
+    [loader, renderUpdate, run, runPolling, runPollingEveryDay]
   );
 
   const setRef: RefCallback<HTMLDivElement> = useCallback(

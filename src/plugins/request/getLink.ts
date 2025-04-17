@@ -1,4 +1,10 @@
+import { getWindowSingle } from "../../window/windowSingle";
+
 export const getLinks = async () => {
+  if (!getWindowSingle().state.currentLoadImportModels.has("modelA")) {
+    return void 0;
+  }
+
   const controller = new AbortController();
   const signal = controller.signal;
 

@@ -1,6 +1,12 @@
+import { getWindowSingle } from "../../window/windowSingle";
 import { setModelUserDataId } from "./setModelId";
 
 export const syncCabinetName = async () => {
+
+   if (!getWindowSingle().state.currentLoadImportModels.has("modelA")) {
+      return void 0;
+    }
+
   const controller = new AbortController();
   const signal = controller.signal;
 
