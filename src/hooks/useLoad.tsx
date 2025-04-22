@@ -11,6 +11,7 @@ import { deviceLevel, selectedTag, unSelectedTag } from "../common/constant";
 
 import { getSubDeviceTag } from "../common/getSubDeviceTag";
 import { LineRelationMap } from "../common/LineRelationMap";
+import { getCurrentScene } from "../common/getCurrentScene";
 /**
  * 加载模型
  * @param models
@@ -52,7 +53,9 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
     originCamera: THREE.PerspectiveCamera | null;
     lineDevice: THREE.Group | null;
     showLines: WeakMap<THREE.Object3D, THREE.Object3D[]>;
+    deviceGroup: THREE.Group;
   }>({
+    deviceGroup: new THREE.Group(),
     allCloneDeviceLinesList: [],
     showLines: new WeakMap(),
     allCloneDeviceList: [],
@@ -112,13 +115,10 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
     gsap.to(gp.rotation, { y: 0, duration: 1 });
     ref.current.openDoor = false;
   }, []);
+  //添加设备
   const addDevice = useCallback(
     (deviceList: (IDevice & { lines: string[] })[]) => {
-      if (
-        getWindowSingle().state.currentLoadImportModels.has(
-          "cabinetAndDeviceModel"
-        )
-      ) {
+      if (getCurrentScene("cabinetAndDeviceModel")) {
         if (Object3DRef.current.cabinet) {
           //移除之前的设备
           Object3DRef.current.allCloneDeviceLinesList.forEach((device) => {
@@ -140,6 +140,11 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
 
             const cloneLineDevice = Object3DRef.current.lineDevice?.clone();
 
+            console.log(
+              Object3DRef.current.lineDevice,
+              "Object3DRef.current.lineDevice"
+            );
+
             const lineDeviceGroup = new THREE.Group();
 
             const lineMeshMapList: THREE.Object3D[] = [];
@@ -155,10 +160,6 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
                     if (item.userData.name === "线") {
                       item.children.forEach((lineMesh) => {
                         lineMesh.userData.floor = device.position - 1;
-                        // lineMesh.userData.aboutPortLines=lineMap.filter(line=>{
-
-                        // })
-
                         lineMesh.userData.meshType = "line";
                         if (device.lines.includes(lineMesh.userData.name)) {
                           lineMesh.layers.set(0);
@@ -196,7 +197,7 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
               Object3DRef.current.showLines.set(cloneDevice, lineMeshMapList);
             }
             lineDeviceGroup.userData.tag = device.position - 1;
-            lineDeviceGroup.scale.set(1, 0.8, 1);
+            lineDeviceGroup.scale.set(1, 0.35, 1);
             lineDeviceGroup.position.set(
               -0.63,
               deviceLevel[device.position - 1],
@@ -211,6 +212,25 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
     []
   );
 
+  const initDevice = useCallback((cab: THREE.Group) => {
+    if (cab) {
+      cab.traverse((child) => {
+        console.log(child, "交换机");
+        if (child.name === "交换机") {
+          Object3DRef.current.device = child;
+        } else if (child.name === "配线架") {
+          Object3DRef.current.distribution = child;
+        } else if (child.name.indexOf("U-") > -1) {
+          child.visible = false;
+        }
+      });
+      if (Object3DRef.current.device) {
+        Object3DRef.current.device.visible = false;
+        Object3DRef.current.deviceGroup.add(Object3DRef.current.device);
+      }
+    }
+  }, []);
+
   /**
    * 对机柜进行一些设置
    * 比如移动 设备与配线架
@@ -219,27 +239,27 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
   const initCab = useCallback((cab: THREE.Group) => {
     if (cab) {
       cab.traverse((child) => {
+        console.log(child, "initCab");
         if (child.name === "门") {
           Object3DRef.current.door = child;
         } else if (child.name === "交换机") {
-          Object3DRef.current.device = child;
+          //  Object3DRef.current.device = child;
         } else if (child.name === "配线架") {
           Object3DRef.current.distribution = child;
+        } else if (child.name === "机柜") {
+          // child.scale.set(1, 1.4, 1);
         }
       });
       //移出设备与配线架
 
-      const deviceGroup = new THREE.Group();
       if (Object3DRef.current.distribution) {
         Object3DRef.current.distribution.visible = false;
-        deviceGroup.add(Object3DRef.current.distribution);
+        Object3DRef.current.deviceGroup.add(Object3DRef.current.distribution);
       }
-      if (Object3DRef.current.device) {
-        Object3DRef.current.device.visible = false;
-        deviceGroup.add(Object3DRef.current.device);
-      }
-
-      getWindowSingle().threeScene.add(deviceGroup);
+      // if (Object3DRef.current.device) {
+      //   Object3DRef.current.device.visible = false;
+      //   deviceGroup.add(Object3DRef.current.device);
+      // }
 
       if (Object3DRef.current.door) {
         let gp: THREE.Group | null = null;
@@ -588,12 +608,21 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
                       const gp = getWindowSingle().objects.pivot.get(
                         Object3DRef.current.door
                       );
-                      console.log(parentGroup, "parentGroupaaa");
+
                       const currentCabinetDevices =
                         getWindowSingle().objects.cabinetDevices.get(
-                          parentGroup.name
+                          (
+                            getWindowSingle().mapping.indexMap01 as Record<
+                              string,
+                              string
+                            >
+                          )?.[parentGroup.name]
                         );
-
+                      console.log(
+                        currentCabinetDevices,
+                        parentGroup,
+                        "parentGroupaaa"
+                      );
                       if (currentCabinetDevices) {
                         addDevice(
                           currentCabinetDevices.map((item) => ({
@@ -601,6 +630,11 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
                             lines: ["1", "48"],
                           }))
                         );
+                        // addDevice([
+                        //   { high: 1, position: 1, lines: [] },
+                        //   { high: 1, position: 2, lines: [] },
+                        //   { high: 1, position: 48, lines: [] },
+                        // ]);
                       }
                       //显示当前机柜下的设备
                       // addDevice([
@@ -669,9 +703,11 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
 
           if (gltf.scene.userData.tag === "cabinetAndDeviceModel") {
             initCab(gltf.scene);
+
             setCabinetAndDeviceModelAttr(gltf.scene);
             gltf.scene.visible = false;
           } else if (gltf.scene.userData.tag === "lineDevice") {
+            initDevice(gltf.scene);
             gltf.scene.position.set(0, 0, 0);
             gltf.scene.scale.set(1, 1, 1);
             gltf.scene.userData.originScale = [1, 1, 1];
@@ -682,7 +718,7 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
             Object3DRef.current.originCamera =
               getWindowSingle().threeCamera.clone();
           }
-
+          getWindowSingle().threeScene.add(Object3DRef.current.deviceGroup);
           //添加标签
         },
         void 0,
@@ -708,6 +744,7 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
     setFar,
     setNear,
     setCabinetAndDeviceModelAttr,
+    initDevice,
   ]);
 
   return {

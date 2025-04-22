@@ -34,13 +34,18 @@ function App() {
 
   const chart = useRef(null);
 
-  const cabinetAndDeviceModel = useMemo(
-    () => new URL("./model/untitled.glb", import.meta.url).href,
+  // const cabinetAndDeviceModel = useMemo(
+  //   () => new URL("./model/untitled.glb", import.meta.url).href,
+  //   []
+  // );
+
+  const lineDevice = useMemo(
+    () => new URL("./model/device.glb", import.meta.url).href,
     []
   );
 
-  const lineDevice = useMemo(
-    () => new URL("./model/lineDevice.glb", import.meta.url).href,
+  const cabinet = useMemo(
+    () => new URL("./model/cabinet.glb", import.meta.url).href,
     []
   );
 
@@ -186,9 +191,13 @@ function App() {
         tag: "lineDevice",
       },
       {
-        model: cabinetAndDeviceModel,
+        model: cabinet,
         tag: "cabinetAndDeviceModel",
       },
+      // {
+      //   model: cabinet,
+      //   tag: "cabinet",
+      // },
     ]);
 
   const onHandleBack = useCallback(() => {

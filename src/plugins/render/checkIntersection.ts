@@ -135,8 +135,7 @@ export const checkIntersection = () => {
             }
           });
         }
-      }
-      if (
+      } else if (
         getWindowSingle().state.currentLoadImportModels.has(
           "cabinetAndDeviceModel"
         )
@@ -146,7 +145,7 @@ export const checkIntersection = () => {
 
         // }, object);
 
-        console.log(object,'object')
+        //console.log(object,'object')
         if (object.userData?.meshType === "line") {
           if (object.isMesh) {
             const targetLineObjectMaterial = Array.isArray(object.material)
