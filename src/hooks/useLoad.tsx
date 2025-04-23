@@ -189,6 +189,7 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
               cloneDevice.visible = true;
               cloneDevice.userData.tag = getSubDeviceTag(device.position - 1);
               cloneDevice.position.set(0.65, -0.34, -0.55);
+              // cloneDevice.scale.set(1, device.high || 1, 1);
               cloneDevice.userData.deviceInfo = device;
               cloneDevice.name = device.name;
               Object3DRef.current.allCloneDeviceList.push(cloneDevice);
@@ -197,10 +198,11 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
               Object3DRef.current.showLines.set(cloneDevice, lineMeshMapList);
             }
             lineDeviceGroup.userData.tag = device.position - 1;
-            lineDeviceGroup.scale.set(1, 0.35, 1);
+            lineDeviceGroup.scale.set(1, 0.35 * (device.high || 1), 1);
             lineDeviceGroup.position.set(
               -0.63,
-              deviceLevel[device.position - 1],
+              deviceLevel[device.position - 1] +
+                (0.04 * (device.high || 1))*2,
               0.89
             );
             Object3DRef.current.allCloneDeviceLinesList.push(lineDeviceGroup);
@@ -352,10 +354,15 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
         duration: 0.7,
         ease: "power2.out",
         onComplete: () => {
+          getWindowSingle().threeOrbitControls.target.set(0, 0, 0);
           setCurrentModel(["modelA"]);
           ref.current.currentModel = "modelA";
           setCurrentModelState(["modelA"]);
+          //  getWindowSingle().threeOrbitControls.target.set(0, 0, 0);
           gsap.to(getWindowSingle().threeCamera.position, {
+            // x: -0.23552076821279963,
+            // y: 0.5470038418440992,
+            // z: 0.9222060922822919,
             x: Object3DRef.current.originCamera?.position.toArray()[0],
             y: Object3DRef.current.originCamera?.position.toArray()[1],
             z: Object3DRef.current.originCamera?.position.toArray()[2],
@@ -466,7 +473,7 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
         }
         return false;
       }, selectedObject);
-
+      console.log(deviceItem,'parentGrousp2')
       if (deviceItem && ref.current.openDoor) {
         Object3DRef.current.allCloneDeviceList.forEach((deviceClone) => {
           if (deviceClone.userData.tag !== deviceItem.userData.tag) {
@@ -551,6 +558,7 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
     } else {
       // getWindowSingle().state.controlUpdate = false;
       // getWindowSingle().threeOrbitControls.enabled = false;
+    
       const parentGroup = findModelByCondition((userData) => {
         if (typeof userData?.name === "string") {
           return userData?.name.indexOf("JG") > -1;
@@ -559,6 +567,7 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
       }, selectedObject);
 
       if (parentGroup?.name) {
+        console.log(parentGroup,'parentGrousp1')
         const direction = new THREE.Vector3();
         getWindowSingle().threeCamera.getWorldDirection(direction);
 
@@ -576,13 +585,16 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
               //必须把场景旋转恢复下
 
               getWindowSingle().threeScene.rotation.y = 0;
-              getWindowSingle().threeOrbitControls.target.set(0, 0, 0);
+              getWindowSingle().threeOrbitControls.target.set(0, 0.27, 0);
               setCurrentModelState([ref.current.currentModel]);
               setCurrentModel([ref.current.currentModel]);
               gsap.to(getWindowSingle().threeCamera.position, {
-                x: Object3DRef.current.originCamera?.position.toArray()[0],
-                y: Object3DRef.current.originCamera?.position.toArray()[1],
-                z: Object3DRef.current.originCamera?.position.toArray()[2],
+                x: -0.23552076821279963,
+                y: 0.5470038418440992,
+                z: 0.9222060922822919,
+                // x: Object3DRef.current.originCamera?.position.toArray()[0],
+                // y: Object3DRef.current.originCamera?.position.toArray()[1],
+                // z: Object3DRef.current.originCamera?.position.toArray()[2],
                 duration: 0.7,
                 ease: "power1.out",
                 onComplete: () => {
@@ -590,6 +602,7 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
                     // getWindowSingle().threeCamera.copy(
                     //   Object3DRef.current.originCamera
                     // );
+
                     getWindowSingle().threeCamera.updateMatrixWorld(true);
                     getWindowSingle().threeCamera.updateMatrix();
                     getWindowSingle().threeOrbitControls.update();
@@ -633,7 +646,7 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
                         // addDevice([
                         //   { high: 1, position: 1, lines: [] },
                         //   { high: 1, position: 2, lines: [] },
-                        //   { high: 1, position: 48, lines: [] },
+                        //   { high: 3, position: 45, lines: [] },
                         // ]);
                       }
                       //显示当前机柜下的设备

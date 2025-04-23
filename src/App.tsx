@@ -202,6 +202,7 @@ function App() {
 
   const onHandleBack = useCallback(() => {
     back();
+    setState("none");
   }, [back]);
 
   return (

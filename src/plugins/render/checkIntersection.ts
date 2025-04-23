@@ -145,7 +145,7 @@ export const checkIntersection = () => {
 
         // }, object);
 
-        //console.log(object,'object')
+        console.log(getWindowSingle().threeCamera,'object')
         if (object.userData?.meshType === "line") {
           if (object.isMesh) {
             const targetLineObjectMaterial = Array.isArray(object.material)
