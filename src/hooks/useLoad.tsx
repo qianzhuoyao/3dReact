@@ -201,8 +201,7 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
             lineDeviceGroup.scale.set(1, 0.35 * (device.high || 1), 1);
             lineDeviceGroup.position.set(
               -0.63,
-              deviceLevel[device.position - 1] +
-                (0.04 * (device.high || 1))*2,
+              deviceLevel[device.position - 1] + 0.04 * (device.high || 1) * 2,
               0.89
             );
             Object3DRef.current.allCloneDeviceLinesList.push(lineDeviceGroup);
@@ -345,8 +344,9 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
       });
 
       const direction = new THREE.Vector3();
+      getWindowSingle().threeScene.scale.set(1, 1, 1);
       getWindowSingle().threeCamera.getWorldDirection(direction);
-      getWindowSingle().threeOrbitControls.target.set(0, 0, 0);
+    
       gsap.to(getWindowSingle().threeCamera.position, {
         x: getWindowSingle().threeCamera.position.x - direction.x * 0.6,
         y: getWindowSingle().threeCamera.position.y - direction.y * 0.6,
@@ -358,7 +358,6 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
           setCurrentModel(["modelA"]);
           ref.current.currentModel = "modelA";
           setCurrentModelState(["modelA"]);
-          //  getWindowSingle().threeOrbitControls.target.set(0, 0, 0);
           gsap.to(getWindowSingle().threeCamera.position, {
             // x: -0.23552076821279963,
             // y: 0.5470038418440992,
@@ -473,7 +472,7 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
         }
         return false;
       }, selectedObject);
-      console.log(deviceItem,'parentGrousp2')
+      console.log(deviceItem, "parentGrousp2");
       if (deviceItem && ref.current.openDoor) {
         Object3DRef.current.allCloneDeviceList.forEach((deviceClone) => {
           if (deviceClone.userData.tag !== deviceItem.userData.tag) {
@@ -558,7 +557,7 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
     } else {
       // getWindowSingle().state.controlUpdate = false;
       // getWindowSingle().threeOrbitControls.enabled = false;
-    
+
       const parentGroup = findModelByCondition((userData) => {
         if (typeof userData?.name === "string") {
           return userData?.name.indexOf("JG") > -1;
@@ -567,7 +566,7 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
       }, selectedObject);
 
       if (parentGroup?.name) {
-        console.log(parentGroup,'parentGrousp1')
+        console.log(parentGroup, "parentGrousp1");
         const direction = new THREE.Vector3();
         getWindowSingle().threeCamera.getWorldDirection(direction);
 
@@ -585,13 +584,14 @@ export const useLoad = (models: { model: string; tag: string }[]) => {
               //必须把场景旋转恢复下
 
               getWindowSingle().threeScene.rotation.y = 0;
-              getWindowSingle().threeOrbitControls.target.set(0, 0.27, 0);
+              getWindowSingle().threeScene.scale.set(1.14, 1.14, 1.14);
+              getWindowSingle().threeOrbitControls.target.set(0, 0.44, 0);
               setCurrentModelState([ref.current.currentModel]);
               setCurrentModel([ref.current.currentModel]);
               gsap.to(getWindowSingle().threeCamera.position, {
-                x: -0.23552076821279963,
-                y: 0.5470038418440992,
-                z: 0.9222060922822919,
+                x: -0.14,
+                y: 0.8470038418440992,
+                z: 1.5,
                 // x: Object3DRef.current.originCamera?.position.toArray()[0],
                 // y: Object3DRef.current.originCamera?.position.toArray()[1],
                 // z: Object3DRef.current.originCamera?.position.toArray()[2],

@@ -87,7 +87,7 @@ export const uploadModel = <T, E>(
                       event.target?.result as ArrayBuffer,
                       "",
                       (gltf) => {
-                        console.log("加载的 glTF 文件:", gltf);
+                        // console.log("加载的 glTF 文件:", gltf);
                         gltf.scene.userData.insertInfo = insertInfo;
                         res({
                           gltf,
@@ -95,6 +95,9 @@ export const uploadModel = <T, E>(
                           newBlob: exportGLTF(gltf.scene),
                           index,
                         });
+                      },
+                      (err) => {
+                        rej(err);
                       }
                     );
                   };

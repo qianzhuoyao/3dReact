@@ -45,7 +45,7 @@ function App() {
   );
 
   const cabinet = useMemo(
-    () => new URL("./model/cabinet.glb", import.meta.url).href,
+    () => new URL("./model/origincab.glb", import.meta.url).href,
     []
   );
 
